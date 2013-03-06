@@ -1,4 +1,7 @@
 function [ jt ] = charge_neutral_flux(j, z )
+% j: total flux, n_comp x n_comp x n_species
+% z: is the vector of valences of the species that can transfer between 
+%    compartment a1 and a2, dimensions: n_comp x n_comp x n_species
 
     sz = size(j);
     disp(sz)
