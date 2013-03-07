@@ -16,6 +16,11 @@ function [ o ] = test()
         z_mob(i,i,:) = 0;
     end
     
+    j = rand(n_comp, n_comp ,n_species);
+    for i=1:n_comp
+        j(i,i,:) = 0;
+    end
+    
 
 
 
@@ -27,12 +32,16 @@ function [ o ] = test()
     disp('e: ')
     disp(e)
 
-    %j = membrane_flux( h,e );
+    j = membrane_flux( h,e );
     
-    %disp('j: ')
-    %disp(j)
+    
+    
+    disp('j: ')
+    disp(j)
 
-    %jt = charge_neutral_flux(j, z_mob );
+    jt = charge_neutral_flux(j, z_mob );
+    
+    disp(jt)
 
 
 
