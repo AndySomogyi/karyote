@@ -46,27 +46,26 @@ function [ f ] = odefun(cap, a, l, h, z, o, nu, mu_ref, r)
         % voltage
         % v: size(1,n_comp)
         
-        cc = s(1:(n_comp*n_species));
-        vv = s((n_comp*n_species)+1:end);
+        fprintf('time: %d\n', t);
         
         c = reshape(s(1:(n_comp*n_species)), [n_comp, n_species]);
         v = reshape(s((n_comp*n_species)+1:end), [1, n_comp]);
         
         e = equilibrium_factor(c,z,v,l);
     
-        disp('z: ')
-        disp(z)
-        disp('e: ')
-        disp(e)
+        %disp('z: ')
+        %disp(z)
+        %disp('e: ')
+        %disp(e)
 
         j(:,:,:) = membrane_flux(h,e);
 
-        disp('j: ')
-        disp(j)
+        %disp('j: ')
+        %disp(j)
 
         jt(:,:,:) = charge_neutral_flux(j, z );
 
-        disp(jt)
+        %disp(jt)
 
         mu = electrochem_potential(mu_ref, c, z, v);
 

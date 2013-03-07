@@ -3,8 +3,6 @@ function [ jt ] = charge_neutral_flux(j, z )
 % z: is the vector of valences, dims: 1 x n_species
 
     sz = size(j);
-    disp(sz)
-
     jt = zeros(sz);
     
     % squeeze((x(i,i,:)) gives a column vector
