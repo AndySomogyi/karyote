@@ -4,8 +4,10 @@ function [mu] = electrochem_potential(mu_ref, c, z, v)
 % c: concentrations, n comp x m species
 % z: valences, m speies
 % v: compartment voltages, n comp
+% returns: mu, n_comp x n_species
 
-    mu = mu_ref + R * R * log(c) + F * z * v;
+    global R F T
+    mu = mu_ref + R * T *  log(c) + F * v' * z;
 
 end
 
