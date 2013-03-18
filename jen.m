@@ -51,9 +51,24 @@ cap(:) = 2e-04;
 % area between compartments, only compartments 1,2 are in contact, and
 % comps 2 and 3 are in contact. 
 a(1, 2) = 1.866e-4;
-a(2, 1) = 1.866e-4;
 a(2, 3) = 1.866e-4;
-a(3, 2) = 1.866e-4;
+
+% make symmetric
+a = a' + triu(a,1);
+
+% thickness of membrane in nm
+%l(0,1) = 4;
+l(1,2) = 2;
+l(2,3) = 2;
+% make symmetric
+l = l' + triu(l,1);
+
+% permeability, (n_comp, n_comp, n_species)
+h(1,2,4) = 1;
+h(2,3,4) = 1;
+
+% valence of species
+z(:) = [0 2 4 2 0 2 -1 -1 0];
 
 % volume of each compartment
 o(:) = [2.0e-7 7.0e07 1.6e-04];
@@ -68,10 +83,33 @@ nu(2,2,2) = -1;
 nu(2,1,4) = -1;
 nu(2,2,3) =  1;
 
+nu(3,2,3) = -1;
+nu(3,2,2) =  1;
+nu(3,3,4) =  1;
 
+nu(4,2,2) = -1;
+nu(4,2,1) =  1;
+nu(4,3,4) =  1;
 
+nu(5,3,5) = -1;
+nu(5,3,4) = -1;
+nu(5,3,6) =  1;
 
+nu(6,3,6) = -1;
+nu(6,3,7) = -1;
+nu(6,3,5) =  1;
+nu(6,3,8) =  1;
+nu(6,3,9) =  1;
+nu(6,3,4) =  1;
 
+%    mu_ref: reference chemical potentail, size(n_comp, n_species)
+% how do I make all of the chemical potentials zero?
 
-
-
+%    r: reverse rate, size(n_comp x n_reactions)
+% we need to do (comp,comp,reaction) I think for transmembrance reactions
+r(1,2,1) = 1.0e11;
+r(1,2,2) = 1.0e11;
+r(2,3,3) = 1.0e11;
+r(2,3,4) = 1.0e11;
+r(3,3,5) = 1.0e10;
+r(3,3,6) = 4.4693e2;
