@@ -1,3 +1,7 @@
+% set the global constants
+global F R T
+F= 96485.3365; R=8.3144621; T=300;
+
 % define the size of the system
 % the semicolon at the end is not required, all it does is suppress 
 % diplaying of the value..
@@ -40,6 +44,12 @@ mu_ref = zeros(n_comp, n_species);
 
 %    r: reverse rate, size(n_comp x n_reactions)
 r = zeros(n_comp, n_reactions);
+
+%    initial values:
+initc = zeros(n_comp, n_species);
+
+%    initial voltage values:
+initv = zeros(1,n_comp);
 
 
 % now we can start assigning actual values
@@ -105,11 +115,34 @@ nu(6,3,4) =  1;
 %    mu_ref: reference chemical potentail, size(n_comp, n_species)
 % how do I make all of the chemical potentials zero?
 
-%    r: reverse rate, size(n_comp x n_reactions)
+% r: reverse rate, size(n_comp x n_reactions)
 % we need to do (comp,comp,reaction) I think for transmembrance reactions
-r(1,2,1) = 1.0e11;
-r(1,2,2) = 1.0e11;
-r(2,3,3) = 1.0e11;
-r(2,3,4) = 1.0e11;
-r(3,3,5) = 1.0e10;
-r(3,3,6) = 4.4693e2;
+r(2,1) = 1.0e11;
+r(2,2) = 1.0e11;
+r(3,3) = 1.0e11;
+r(3,4) = 1.0e11;
+r(3,5) = 1.0e10;
+r(3,6) = 4.4693e2;
+
+initc(:,1) = 1.0e-4;
+initc(:,2) = 6.25e-4;
+initc(:,3) = 6.0e-4;
+initc(:,4) = 1.15e-4;
+initc(:,5) = 2.7e-5;
+initc(:,6) = 1.161e-3;
+initc(:,7) = 4.89e-3;
+initc(:,8) = 4.863e-3;
+initc(:,9) = 2.7e-5;
+
+% set initial voltage
+initv(:) = [0.0 0.07 0.07];
+
+% packed initial values
+init = karyote_pack(initc, initv);
+
+fun = odefun(cap, a, l, h, z, o, nu, mu_ref, r);
+
+[t,y] = ode45(fun,[0 0.1], init);
+
+
+
