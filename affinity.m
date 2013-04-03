@@ -1,16 +1,32 @@
-function [ y ] = affinity(nu, mu)
-% y_{k,a} = \sum_i \nu_{ika} \mu_{ia}
-% nu: stoichiometric cooefecients, nu = (n_reactions, n_comp, n_species)
-% mu electrochemical potential, n_comp x n_species
-% return, y: n_comp x n_reactions
+function [ y ] = affinity(s, mu)
+% The total affinity for the reactions. 
+% adds up the saved reference chem pot, and the stoich weighted
+% chemical potentials for each species in the reaction. 
+%
+% s: stochiometry matrix: ((n_species * n_comp), n_reactions)
+% mu: chemical poteial for each species, with out the reference chem pot. 
+%     
 
-    n_comp = size(mu, 1);
-    y = zeros(n_comp, size(nu,1));
-    
-    for i = 1:n_comp
-        vik = squeeze(nu(:,i,:))'; % n_species x n_reactions
-        mui = mu(i,:);             % 1 x n_species
-        y(i,:) = mui * vik;
-    end
 end
 
+function [ j_active ] = active_flux(c, s, k)
+% Foo
+%   c: concentration size: (single column vector of n_species * n_comp)
+%   
+%   k: reaction rate constants: n_reactions x 2
+
+    n_reactions = length(k); 
+
+    nu = zeros(n_reactions, 1);
+    r = zeros(size(c));
+    
+    for i=1:n_reactions
+        ind = find(s(:,i) < 0);
+        r(:) = 0;
+        r(ind) = abs(s(ind,i));
+        
+        nu(i) = k(i) * prod(c.^r);
+    end
+    
+    j_active = s * nu;
+end
