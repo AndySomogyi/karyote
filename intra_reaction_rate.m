@@ -1,4 +1,4 @@
-function [w] = net_reaction_rate(k, a)
+function [w] = intra_reaction_rate(k, a)
 % Determines the rate of reaction for species i in compartment a. 
 %
 % y: affinity, n_comp x n_reactions
