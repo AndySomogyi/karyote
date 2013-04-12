@@ -7,6 +7,7 @@ function [dvdt] = dvdt(a, z, j, cap)
 %
 % a: area of membrane separating compartment a from a'
 % z: valence of species i
+% j: intra compartment flux, n_species,n_comp,n_comp
 %
 % returns a row vector of dvdt
 %
@@ -26,7 +27,7 @@ function [dvdt] = dvdt(a, z, j, cap)
     zj = zeros(1,n);
     for i = 1:n
         for k = 1:n
-            zj(k) = z * squeeze(j(i,k,:));
+            zj(k) = z * j(:,i,k);
         end
         rhs(i) = F * a(i,:) * zj';
     end

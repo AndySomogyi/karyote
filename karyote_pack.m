@@ -5,8 +5,8 @@ function [ packed ] = karyote_pack( c,v )
 % packed storage: first n_comp*n_species is the concentration matrix, 
 % last n_comp is the compartment voltage. 
 
-    n_comp = size(c,1);
-    n_species = size(c,2);
+    n_comp = size(c,2);
+    n_species = size(c,1);
     packed = zeros((n_comp*n_species) + n_comp, 1);
 
     

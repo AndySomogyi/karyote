@@ -36,14 +36,8 @@ o = zeros(1,n_comp);
 
 %    nu: = stoichiometric coefficient of species i for reaction k in
 %        compartment a. dims: nreactions x ncomp x nspecies
-nu = zeros(n_reactions, n_comp, n_species);
+s = zeros(n_species, n_comp, n_reactions);
 
-%    mu_ref: reference chemical potentail for species i in compartment a, 
-%        size(n_comp, n_species)
-mu_ref = zeros(n_comp, n_species);
-
-%    r: reverse rate, size(n_comp x n_reactions)
-r = zeros(n_comp, n_reactions);
 
 %    initial values:
 initc = zeros(n_comp, n_species);
@@ -85,32 +79,32 @@ o(:) = [2.0e-7 7.0e07 1.6e-04];
 
 % stoichometry, indexing: nreactions x ncomp x nspecies
 % MCU(2) + Ca2+(1) <-> MCU[Ca2+](2)
-nu(1,2,1) = -1;
-nu(1,1,4) = -1;
-nu(1,2,2) =  1;
+s(1,2,1) = -1;
+s(1,1,4) = -1;
+s(1,2,2) =  1;
 
-nu(2,2,2) = -1;
-nu(2,1,4) = -1;
-nu(2,2,3) =  1;
+s(2,2,2) = -1;
+s(2,1,4) = -1;
+s(2,2,3) =  1;
 
-nu(3,2,3) = -1;
-nu(3,2,2) =  1;
-nu(3,3,4) =  1;
+s(3,2,3) = -1;
+s(3,2,2) =  1;
+s(3,3,4) =  1;
 
-nu(4,2,2) = -1;
-nu(4,2,1) =  1;
-nu(4,3,4) =  1;
+s(4,2,2) = -1;
+s(4,2,1) =  1;
+s(4,3,4) =  1;
 
-nu(5,3,5) = -1;
-nu(5,3,4) = -1;
-nu(5,3,6) =  1;
+s(5,3,5) = -1;
+s(5,3,4) = -1;
+s(5,3,6) =  1;
 
-nu(6,3,6) = -1;
-nu(6,3,7) = -1;
-nu(6,3,5) =  1;
-nu(6,3,8) =  1;
-nu(6,3,9) =  1;
-nu(6,3,4) =  1;
+s(6,3,6) = -1;
+s(6,3,7) = -1;
+s(6,3,5) =  1;
+s(6,3,8) =  1;
+s(6,3,9) =  1;
+s(6,3,4) =  1;
 
 %    mu_ref: reference chemical potentail, size(n_comp, n_species)
 % how do I make all of the chemical potentials zero?
@@ -140,7 +134,7 @@ initv(:) = [0.0 0.07 0.07];
 % packed initial values
 init = karyote_pack(initc, initv);
 
-fun = odefun(cap, a, l, h, z, o, nu, mu_ref, r);
+fun = odefun(cap, a, l, h, z, o, s, mu_ref, r);
 
 [t,y] = ode45(fun,[0 0.1], init);
 
