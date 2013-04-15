@@ -12,6 +12,7 @@ n_reactions = 1;
 % each column is a compartment, each row in the column is a species.
 c0 = [1 2 0.00001 0.000001;
       1 2 0.00001 0.000001]';
+c0(:,1) = c0(:,1) * 2;
   
 % stoichiometry matrix n_species, n_comp, n_reactions
 s = zeros(n_species, n_comp, n_reactions);
@@ -33,15 +34,21 @@ cap = abs(eye(n_comp,n_comp) - 1);
 a = abs(eye(n_comp,n_comp) - 1);
 l = abs(eye(n_comp,n_comp) - 1);
 o = ones(n_comp, 1);
-h = zeros(n_species, n_comp, n_comp);
+
+% membrane permeability
+% test with membrane partially permeable to all species.
+h = ones(n_species, n_comp, n_comp) * 0.01;
 
 fun = odefun(cap, a, l, h, z, o, s, k);
 
 state = karyote_pack(c0,v);
 
-[t,y] = ode45(fun, [0 500], state);
+[t,y] = ode45(fun, [0 200], state);
 
 c = y(:,1:(n_species*n_comp));
+
+disp(c(1,:));
+disp(c(end,:));
     
 plot(t,c);
 

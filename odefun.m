@@ -28,7 +28,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     j = zeros(n_species, n_comp, n_comp);
     
     % charge-neutral flux of species from a' to a, 
-    jt = zeros(n_comp, n_comp, n_species);
+    jn = zeros(size(j));
+    
+    dcdt_trans = zeros(n_species, n_comp);
     
     
     function [state] = fun(t,state)
@@ -49,14 +51,18 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         % voltage vector, n_comp x 1
         v = state((n_comp*n_species)+1:end);
         
-
-
-        dcdt_v = intra_reaction_rate(c, s, k, z, v);
-        
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
+        jn(:) = charge_neutral_flux(j, z );
+       
+        dcdt_v = intra_reaction_rate(c, s, k, z, v);
         
-
+        for i = 1:n_comp
+            dcdt_trans(:,i) = sum(jn(:,:,i), 2);
+        end
+        
+        dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
+        
         dvdt_v  = dvdt(a, z, j, cap);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);
