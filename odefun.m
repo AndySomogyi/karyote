@@ -18,6 +18,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
 
     f = @fun;
     
+    % all sizes are determined by the stoichiometry matrix, everything
+    % else should agree.
     n_species = size(s, 1);
     n_comp = size(s, 2);
     n_reactions = size(s, 3);
@@ -31,6 +33,11 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     jn = zeros(size(j));
     
     dcdt_trans = zeros(n_species, n_comp);
+    
+    % h: membrane permeability. size: n_species x n_comp x n_comp.
+    assert(size(h, 1) == n_species, 'permeability must be [n_species,n_comp,n_comp]');
+    assert(size(h, 2) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
+    assert(size(h, 3) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
     
     
     function [state] = fun(t,state)

@@ -1,3 +1,7 @@
+% set the global constants
+global F R T
+F= 96485.3365; R=8.3144621; T=300;
+
 % define the size of the system
 % the semicolon at the end is not required, all it does is suppress 
 % diplaying of the value..
@@ -22,7 +26,7 @@ l = zeros(n_comp, n_comp);
 
 %    h: membrane permeability for species i between compartments, 
 %        size(n_comp, n_comp, n_species).
-h = zeros(n_comp, n_comp, n_species);
+h = zeros(n_species, n_comp, n_comp);
 
 %    z: valence of species i, size(n_species)
 z = zeros(1,n_species);
@@ -45,7 +49,12 @@ k = zeros(n_reactions, 2);
 c = zeros(n_comp, n_species);
 
 %    voltage
-v = zeros(n_comp);
+v = zeros(1,n_comp);
+
+% "atom" count per species, not actually the real atom count, just
+% how many things have to be conserved, for example, Adenesine is a 1
+% because is always remains intact, but combines with other things.
+ac = zeros(n_species);
 
 
 % now we can start assigning actual values
@@ -70,44 +79,44 @@ l(2,3) = 2;
 l = l' + triu(l,1);
 
 % permeability, (n_comp, n_comp, n_species)
-h(4,1,18) = 1;
-h(4,1,104) = 1;
-h(1,2,17) = 1;
-h(1,2,18) = 1;
-h(1,2,30) = 1;
-h(1,2,24) = 1;
-h(1,2,23) = 1;
-h(1,2,27) = 1;
-h(1,2,104) = 1;
-h(2,1,30) = 1;
-h(2,1,24) = 1;
-h(2,1,23) = 1;
-h(2,1,27) = 1;
-h(2,1,104) = 1;
-h(2,3,7) = 1;
-h(2,3,8) = 1;
-h(2,3,18) = 1;
-h(2,3,14) = 1;
-h(2,3,15) = 1;
-h(2,3,17) = 1;
-h(2,3,23) = 1;
-h(2,3,24) = 1;
-h(2,3,26) = 1;
-h(2,3,27) = 1;
-h(2,3,31) = 1;
-h(2,3,104) = 1;
-h(3,2,7) = 1;
-h(3,2,8) = 1;
-h(3,2,14) = 1;
-h(3,2,15) = 1;
-h(3,2,17) = 1;
-h(3,2,23) = 1;
-h(3,2,24) = 1;
-h(3,2,26) = 1;
-h(3,2,27) = 1;
-h(3,2,28) = 1;
-h(3,2,31) = 1;
-h(3,2,104) = 1;
+h(18,  4,1) = 1;
+h(104, 4,1) = 1;
+h(17,  1,2) = 1;
+h(18,  1,2) = 1;
+h(30,  1,2) = 1;
+h(24,  1,2) = 1;
+h(23,  1,2) = 1;
+h(27,  1,2) = 1;
+h(104, 1,2) = 1;
+h(30,  2,1) = 1;
+h(24,  2,1) = 1;
+h(23,  2,1) = 1;
+h(27,  2,1) = 1;
+h(104, 2,1) = 1;
+h(7,   2,3) = 1;
+h(8,   2,3) = 1;
+h(18,  2,3) = 1;
+h(14,  2,3) = 1;
+h(15,  2,3) = 1;
+h(17,  2,3) = 1;
+h(23,  2,3) = 1;
+h(24,  2,3) = 1;
+h(26,  2,3) = 1;
+h(27,  2,3) = 1;
+h(31,  2,3) = 1;
+h(104, 2,3) = 1;
+h(7,   3,2) = 1;
+h(8,   3,2) = 1;
+h(14,  3,2) = 1;
+h(15,  3,2) = 1;
+h(17,  3,2) = 1;
+h(23,  3,2) = 1;
+h(24,  3,2) = 1;
+h(26,  3,2) = 1;
+h(27,  3,2) = 1;
+h(28,  3,2) = 1;
+h(31,  3,2) = 1;
+h(104, 3,2) = 1;
 
 % valence of species
 z(2) = -3;
@@ -442,11 +451,9 @@ nu(29,3,67) = 1;
 nu(27,1,67) = 1;
 nu(100,2,68) = -1;
 nu(27,3,68) = -2;
-nu(103,1,68) = -1;
 nu(95,2,68) = 1;
 nu(29,3,68) = 1;
 nu(27,1,68) = 1;
-nu(103,1,68) = 1;
 nu(109,2,69) = -1;
 nu(104,1,69) = -1;
 nu(110,2,69) = 1;
@@ -546,6 +553,13 @@ k(74,1) = 1.0e5;
 k(:,2) = 1.0e-2;
 
 % concentration inside c(n_comp x n_specie)
+% this should actually be n_species, n_comp, but already writen
+% as n_comp, n_species, so in order to save time, 
+% we'll just take the transpose of it:)
+
+% first set each concentration to a very small value, can not be zero.
+c(:) = 1.0e-10;
+
 c(1,16) = 9.6880398e-3;
 c(1,17) = 3.40570052e-2;
 c(1,18) = 1.87e-4;
@@ -676,8 +690,27 @@ c(4,19) = 1.87e-4;
 c(4,27) = 5.20e-9;
 c(4,104) = 1.15e-3;
 
+% just take the tanspose of it...
+c=c';
+
 
 % voltage v(n_comp)
+% initial values for compartment potentials. 
+v(:) = 0;
+
+verify_stochiometry(nu, z);
+
+% make the function that the integrator calls. 
+fun = odefun(cap, a, l, h, z, o, nu, k);
+
+% pack the initial values into the state vector
+state = karyote_pack(c,v);
+
+% test the function, call it once with the starting state vector. 
+[t,y] = ode45(fun, [0 1], state);
+
+
+
 
 
 

@@ -21,16 +21,16 @@ function [  ] = verify_stochiometry( s, z )
     r = zeros(n_species*n_comp, 1);
     for i=1:n_reactions
         % reactants
-        ind = find(s(:,i) < 0);
+        ind_lhs = find(s(:,i) < 0);
         r(:) = 0;
-        r(ind) = abs(s(ind,i));
+        r(ind_lhs) = abs(s(ind_lhs,i));
         
         lhs = z * r;
         
         % products
-        ind = find(s(:,i) > 0);
+        ind_rhs = find(s(:,i) > 0);
         r(:) = 0;
-        r(ind) = abs(s(ind,i));
+        r(ind_rhs) = abs(s(ind_rhs,i));
         
         rhs = z * r;
         
