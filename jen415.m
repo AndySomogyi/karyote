@@ -72,6 +72,8 @@ a(2, 3) = 1.866e-4;
 a = a' + triu(a,1);
 
 % thickness of membrane in nm
+% default is infinitly thick membrane
+l(:) = Inf;
 l(4,1) = 4;
 l(1,2) = 2;
 l(2,3) = 2;
@@ -475,6 +477,9 @@ nu(112,3,74) = 1;
 nu(104,1,74) = 1;
 nu(17,2,74) = 3;
 
+% only do intra compartment reactions
+nu = nu(:,:,1:44);
+
 %     k = (n_reactions, 2);
 k(1,1) = 1.0e1;
 k(2,1) = 1.0e1;
@@ -551,6 +556,8 @@ k(72,1) = 1.0e11;
 k(73,1) = 1.0e11;
 k(74,1) = 1.0e5;
 k(:,2) = 1.0e-2;
+
+k = k(1:44,:);
 
 % concentration inside c(n_comp x n_specie)
 % this should actually be n_species, n_comp, but already writen
@@ -707,7 +714,17 @@ fun = odefun(cap, a, l, h, z, o, nu, k);
 state = karyote_pack(c,v);
 
 % test the function, call it once with the starting state vector. 
-[t,y] = ode45(fun, [0 1], state);
+options = odeset('NonNegative', 1:length(state));
+[t,y] = ode45(fun, [0 0.00001], state, options);
+
+c = y(:,1:(50));
+
+disp(c(1,:));
+disp(c(end,:));
+
+v = y(:,end-3:end);
+
+plot(t,c);
 
 
 

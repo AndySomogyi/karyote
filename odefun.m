@@ -58,6 +58,16 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         % voltage vector, n_comp x 1
         v = state((n_comp*n_species)+1:end);
         
+        % check to see that concentration is positive, and NOT 0 or
+        % negative.
+        ci = find(c <= 0);
+        if ~isempty(ci)   
+            comp = floor((ci-1)/n_species)+1;
+            species = mod(ci-1,n_species)+1;
+            items = [comp',species'];
+            error('zero or negative concentration of [comp,species], [%s]', num2str(items));
+        end
+        
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
         jn(:) = charge_neutral_flux(j, z );
@@ -68,7 +78,15 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
             dcdt_trans(:,i) = sum(jn(:,:,i), 2);
         end
         
+        disp(dcdt_trans(114,:));
+        
+        disp(dcdt_v(114));
+        
+        
         dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
+        
+        disp(dcdt_v(114));
+        
         
         dvdt_v  = dvdt(a, z, j, cap);
         
