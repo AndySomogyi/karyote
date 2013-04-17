@@ -43,7 +43,7 @@ fun = odefun(cap, a, l, h, z, o, s, k);
 
 state = karyote_pack(c0,v);
 
-[t,y] = ode45(fun, [0 200], state);
+[t,y] = ode15s(fun, [0 200], state);
 
 c = y(:,1:(n_species*n_comp));
 

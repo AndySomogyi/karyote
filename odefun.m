@@ -39,6 +39,16 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     assert(size(h, 2) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 3) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
     
+    % the mobile valences, these are species
+    % which can either diffuse or are actively pumped between compartments.
+    % start with species that can diffuse, put in active pumping later.
+    z_mobi = zeros(size(h));
+    for ii=1:n_comp
+        for jj=1:n_comp
+            nz = logical(h(:,ii,jj) > 0);
+            z_mobi(nz) = z(nz);
+        end
+    end
     
     function [state] = fun(t,state)
         % the entire state, [concentration; potential] is wrapped
@@ -51,7 +61,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         % voltage
         % v: size(1,n_comp)
         
-        fprintf('time: %d\n', t);
+        %fprintf('time: %d\n', t);
         
         % concentration vector, organized by compartment, then species. 
         c = state(1:(n_comp*n_species));
@@ -60,6 +70,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         % check to see that concentration is positive, and NOT 0 or
         % negative.
+        
+        %fprintf('value: %d\n', c(273))
+        
         ci = find(c <= 0);
         if ~isempty(ci)   
             comp = floor((ci-1)/n_species)+1;
@@ -70,22 +83,20 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
-        jn(:) = charge_neutral_flux(j, z );
+        jn(:) = charge_neutral_flux(j, z_mobi);
        
         dcdt_v = intra_reaction_rate(c, s, k, z, v);
+        
+        %fprintf('dcdt intra: %d \n', dcdt_v(273));
         
         for i = 1:n_comp
             dcdt_trans(:,i) = sum(jn(:,:,i), 2);
         end
-        
-        disp(dcdt_trans(114,:));
-        
-        disp(dcdt_v(114));
-        
-        
+                
         dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
         
-        disp(dcdt_v(114));
+        %fprintf('dcdt both: %d \n', dcdt_v(273));
+        
         
         
         dvdt_v  = dvdt(a, z, j, cap);
