@@ -708,8 +708,8 @@ c=c';
 v(:) = 0;
 
 % atom count
-ac(1) = 
-ac(2)
+%ac(1) = 
+%ac(2)
 
 
 verify_stochiometry(nu, z);

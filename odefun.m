@@ -38,6 +38,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     assert(size(h, 1) == n_species, 'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 2) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 3) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
+    assert(ismatrix(o) && length(o) == n_comp, 'length of compartment volume o must be n_comp');
     
     % the mobile valences, these are species
     % which can either diffuse or are actively pumped between compartments.
@@ -73,13 +74,13 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         %fprintf('value: %d\n', c(273))
         
-        ci = find(c <= 0);
-        if ~isempty(ci)   
-            comp = floor((ci-1)/n_species)+1;
-            species = mod(ci-1,n_species)+1;
-            items = [comp',species'];
-            error('zero or negative concentration of [comp,species], [%s]', num2str(items));
-        end
+        %ci = find(c <= 0);
+        %if ~isempty(ci)   
+        %    comp = floor((ci-1)/n_species)+1;
+        %    species = mod(ci-1,n_species)+1;
+        %    items = [comp',species'];
+        %    warning('zero or negative concentration of [comp,species], [%s]', num2str(items));
+        %end
         
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
@@ -90,7 +91,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         %fprintf('dcdt intra: %d \n', dcdt_v(273));
         
         for i = 1:n_comp
-            dcdt_trans(:,i) = sum(jn(:,:,i), 2);
+            dcdt_trans(:,i) = sum(jn(:,:,i), 2) / o(i);
         end
                 
         dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
@@ -99,7 +100,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         
         
-        dvdt_v  = dvdt(a, z, j, cap);
+        %dvdt_v  = dvdt(a, z, j, cap);
+        dvdt_v = zeros(n_comp, 1);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);
         state((n_comp*n_species)+1:end) = dvdt_v;

@@ -1,4 +1,5 @@
 function [e] = equilibrium_factor(c,z,v,l)
+% The GHK flux equation
 % c: concentration, size: (n compartment x m species), 1
 % z: valences, m species
 % v: voltages for compartments, n comp
@@ -33,12 +34,16 @@ end
 
 
 function [e] = non_zero_q(q, c1, c2, l)
-    eql = exp(q * l);            
-    e = q .* (                                ...
-                  ((c1 - c2)' .* eql ) ...
-                  ./                          ...
-                  (1-eql)                     ...
-             );
+    if ~isempty(q) > 0
+        eql = exp(q * l);            
+        e = q .* (                                ...
+                      (c1' - c2' .* eql ) ...
+                      ./                          ...
+                      (1-eql)                     ...
+                 );
+    else
+        e = zeros(size(c1));
+    end
 end
 
 function [e] = zero_q(c1, c2, l)

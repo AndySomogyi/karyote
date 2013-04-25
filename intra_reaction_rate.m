@@ -5,43 +5,44 @@ function [dcdt] = intra_reaction_rate(c, s, k, z, v)
 %    C1S1, C1S2, C1S3, C2S1, C2S2,...
 % s: stochiometry matrix: ((n_species * n_comp), n_reactions)
 % k: reaction rate constants: n_reactions x 2
-% z: valences, m species
-% v: compartment voltages, n comp
+% z: valences, 1,n_species
+% v: compartment voltages, n_comp, 1
 
     global F R T
-
+    
+    n_comp = length(v);
+    
     n_reactions = size(k, 1); 
-    rev = zeros(n_reactions, 1);
+    nu = zeros(n_reactions, 1);
+    n_species = size(s, 1) / n_comp;
     
-    % chemical potential without reference bit
-    mu = log(c);
+    % potential for all species in all compartments
+    v = kron(v, ones(n_species, 1));
     
-    % reference chem potential
-    g0 = log(k(:,1) ./ k(:,2));
+    % valence for all species in all compartments, 
+    % make it a column vector (TODO, this should start as a column vec).
+    z = kron(ones(1, n_comp), z)';
     
-    % electrochemical part of chem potential, the Kronecker product
-    % is used to unfold the potential and valences to the same layout
-    % as the concentrations. 
-    mu_e = reshape((F/(R*T))*kron(v, z), size(mu));
-    
-    mu = mu + mu_e;
-    
-    a = (g0 - s' * mu);
-    
-    % reverse part of stochiometry matrix
+    % electro part of chemical potential, 
+    mu_e = ((F/(R*T)) * z .* v)';
+   
+    % reverse stoichiometric constants
     rs = s;
     rs(rs < 0) = 0;
     
+    % foward stochiometric constants
     fs = s;
     fs(fs > 0) = 0;
     fs = abs(fs);
     
+    % could be one line each, but breaking up makes debugging easier. 
     for i = 1:n_reactions
-        rev(i) = k(i,2) * prod(c.^rs(:,i));
+        fwd = k(i,1) * prod(c.^fs(:,i));
+        fwd_e = mu_e * fs(:,i) / (R*T);
+        rev = k(i,2) * prod(c.^rs(:,i));
+        rev_e = mu_e * rs(:,i) / (R*T);
+        nu(i) = fwd * exp(fwd_e) - rev * exp(rev_e);
     end
-    
-    % the net reaction rate. 
-    nu = rev .* (exp(a) - 1);
     
     % matrix product of stochiometric matrix and rate vector, 
     % this is dc/dt for the intra-compartment part of the reactions. 

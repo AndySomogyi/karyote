@@ -32,5 +32,5 @@ function [dvdt] = dvdt(a, z, j, cap)
         rhs(i) = F * a(i,:) * zj';
     end
 
-    dvdt = rhs \ ac;
+    dvdt = -rhs \ ac;
 end
