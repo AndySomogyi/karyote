@@ -12,7 +12,7 @@ function [] = test_dvdt2()
 
     z = 1;
     j = zeros(1,n_comp, n_comp);
-    j(1,2,1) = 1;
+    j(1,1,2) = 1;
 
     % resistance:
     r = ones(n_comp) * 1;
@@ -30,8 +30,9 @@ function [] = test_dvdt2()
     clear C;
     disp(dvdt_inv);
     dvdt_inv = inv(dvdt_inv);
+    assert(all(all(isfinite(dvdt_inv))), 'capacitance matrix is not invertable');
 
-    v0 = [0 1]';
+    v0 = [0 -1]';
 
 
 

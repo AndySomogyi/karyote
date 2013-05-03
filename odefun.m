@@ -64,8 +64,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     end
     clear C;
     dvdt_inv = inv(dvdt_inv);
-    
-    assert(all(isfinite(dvdt_inv)), 'capacitance matrix is not invertable, ');
+    assert(all(all(isfinite(dvdt_inv))), 'capacitance matrix is not invertable');
     
     function [state] = fun(t,state)
         % the entire state, [concentration; potential] is wrapped
