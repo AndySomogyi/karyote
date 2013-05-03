@@ -51,6 +51,22 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         end
     end
     
+    % calculate the inverse of the capacitance matrix. 
+    % the given cap matrix is actually capacitance per unit area, so
+    % this needs to be multiplied by membrane contact area to get 
+    % the total membrane <-> membrane capacitance.
+    % capacitance current convention is all currents leaving
+
+    C = a .* cap;
+    dvdt_inv = C(2:end,2:end);
+    for i = 1:size(dvdt_inv, 1)
+        dvdt_inv(i,i) = -sum(C(i+1,:));
+    end
+    clear C;
+    dvdt_inv = inv(dvdt_inv);
+    
+    assert(all(isfinite(dvdt_inv)), 'capacitance matrix is not invertable, ');
+    
     function [state] = fun(t,state)
         % the entire state, [concentration; potential] is wrapped
         % up in the state vector s. s should be 
@@ -90,8 +106,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         %fprintf('dcdt intra: %d \n', dcdt_v(273));
         
-        for i = 1:n_comp
-            dcdt_trans(:,i) = sum(jn(:,:,i), 2) / o(i);
+        for kk = 1:n_comp
+            dcdt_trans(:,kk) = sum(jn(:,:,kk), 2) / o(kk);
         end
                 
         dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
@@ -100,8 +116,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         
         
-        %dvdt_v  = dvdt(a, z, j, cap);
-        dvdt_v = zeros(n_comp, 1);
+        dvdt_v  = dvdt(a, z, j, cap);
+        %dvdt_v = zeros(n_comp, 1);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);
         state((n_comp*n_species)+1:end) = dvdt_v;

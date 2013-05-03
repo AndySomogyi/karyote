@@ -26,7 +26,7 @@ z = [-1];
 % initial compartment voltage
 v = [-.2 .2];
 
-cap = abs(eye(n_comp,n_comp) - 1);
+cap = abs(eye(n_comp,n_comp) - 1) * 2e-1;
 
 a = abs(eye(n_comp,n_comp) - 1);
 l = abs(eye(n_comp,n_comp) - 1);
