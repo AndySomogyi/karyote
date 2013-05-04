@@ -41,6 +41,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     assert(size(h, 1) == n_species, 'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 2) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 3) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
+    assert(ismatrix(o) && length(o) == n_comp, 'length of compartment volume o must be n_comp');
     
     assert(length(o) ==  n_comp && ismatrix(o), 'volume vector must have the same length as n_comp');
     
@@ -54,6 +55,21 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
             z_mobi(nz) = z(nz);
         end
     end
+    
+    % calculate the inverse of the capacitance matrix. 
+    % the given cap matrix is actually capacitance per unit area, so
+    % this needs to be multiplied by membrane contact area to get 
+    % the total membrane <-> membrane capacitance.
+    % capacitance current convention is all currents leaving
+
+    C = a .* cap;
+    dvdt_inv = C(2:end,2:end);
+    for i = 1:size(dvdt_inv, 1)
+        dvdt_inv(i,i) = -sum(C(i+1,:));
+    end
+    clear C;
+    dvdt_inv = inv(dvdt_inv);
+    assert(all(all(isfinite(dvdt_inv))), 'capacitance matrix is not invertable');
     
     function [state] = fun(t,state)
         % the entire state, [concentration; potential] is wrapped
@@ -78,15 +94,13 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         %fprintf('value: %d\n', c(273))
         
-        %c = abs(c);
-        
-        ci = find(c <= 0);
-        if ~isempty(ci)   
-            comp = floor((ci-1)/n_species)+1;
-            species = mod(ci-1,n_species)+1;
-            items = [comp',species'];
-            error('zero or negative concentration of [comp,species], [%s]', num2str(items));
-        end
+        %ci = find(c <= 0);
+        %if ~isempty(ci)   
+        %    comp = floor((ci-1)/n_species)+1;
+        %    species = mod(ci-1,n_species)+1;
+        %    items = [comp',species'];
+        %    warning('zero or negative concentration of [comp,species], [%s]', num2str(items));
+        %end
         
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
@@ -96,17 +110,16 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         %fprintf('dcdt intra: %d \n', dcdt_v(273));
         
-        for i = 1:n_comp
-            dcdt_trans(:,i) = (1/o(i)) * sum(jn(:,:,i), 2);
+        for kk = 1:n_comp
+            dcdt_trans(:,kk) = sum(jn(:,:,kk), 2) / o(kk);
         end
                 
         dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
         
         %fprintf('dcdt both: %d \n', dcdt_v(273));
         
-        
-        
         dvdt_v  = dvdt(a, z, j, cap);
+        %dvdt_v = zeros(n_comp, 1);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);
         state((n_comp*n_species)+1:end) = dvdt_v;
