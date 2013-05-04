@@ -120,7 +120,7 @@ h(28,  3,2) = 1;
 h(31,  3,2) = 1;
 h(104, 3,2) = 1;
 
-h(:) = 0;
+%h(:) = 0;
 
 % valence of species
 z(2) = -3;
@@ -325,8 +325,8 @@ nu(33,3,36) = -1;
 nu(20,3,36) = 1;
 nu(34,3,36) = 1;
 nu(103,3,36) = 1;
-%nu(43,3,37) = -1;
-%nu(44,3,37) = 1;
+nu(43,3,37) = -1;
+nu(44,3,37) = 1;
 nu(47,3,38) = -1;
 nu(48,3,38) = 1;
 nu(101,3,38) = 1;
@@ -720,11 +720,22 @@ fun = odefun(cap, a, l, h, z, o, nu, k);
 % pack the initial values into the state vector
 state = karyote_pack(c,v);
 
-% test the function, call it once with the starting state vector. 
-options = odeset('NonNegative', 1:length(state));
-[t,y] = ode15s(fun, [0 0.0001], state, options);
+yp0 = zeros(size(state));
 
-c = y(:,1:(50));
+% test the function, call it once with the starting state vector. 
+%options = odeset('NonNegative', 1:length(state)-n_comp, ...
+%        'MaxStep', 1e-5);
+    
+% test the function, call it once with the starting state vector. 
+t0 = 0;
+tf = 0.00001;
+options = odeset('NonNegative', 1:(length(state)-n_comp), ...
+                 'RelTol', 1e-15, ...
+                 'AbsTol', 1e-30, ...
+                 'InitialStep', 0.01*abs(t0-tf));
+[t,y] = ode15s(fun, [t0 tf], state, options);
+
+c = y(:,2*n_species+1:3*n_species);
 
 disp(c(1,:));
 disp(c(end,:));

@@ -24,6 +24,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     n_comp = size(s, 2);
     n_reactions = size(s, 3);
     
+    fprintf('creating system for %i species, %i compartments, %i reactions\n', ...
+        n_species, n_comp, n_reactions);
+    
     s = reshape(s, [n_species*n_comp, n_reactions]);
     
     % total membrane flus of species i from a to a'
@@ -38,6 +41,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     assert(size(h, 1) == n_species, 'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 2) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
     assert(size(h, 3) == n_comp,    'permeability must be [n_species,n_comp,n_comp]');
+    
+    assert(length(o) ==  n_comp && ismatrix(o), 'volume vector must have the same length as n_comp');
     
     % the mobile valences, these are species
     % which can either diffuse or are actively pumped between compartments.
@@ -73,6 +78,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         %fprintf('value: %d\n', c(273))
         
+        %c = abs(c);
+        
         ci = find(c <= 0);
         if ~isempty(ci)   
             comp = floor((ci-1)/n_species)+1;
@@ -90,7 +97,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         %fprintf('dcdt intra: %d \n', dcdt_v(273));
         
         for i = 1:n_comp
-            dcdt_trans(:,i) = sum(jn(:,:,i), 2);
+            dcdt_trans(:,i) = (1/o(i)) * sum(jn(:,:,i), 2);
         end
                 
         dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
