@@ -1,4 +1,4 @@
-function [ f ] = odefun(cap, a, l, h, z, o, s, k)
+function [ f ] = odefun(cap, a, l, h, z, o, s, k, r)
 % Create the odefunc that is given to an integrator. 
 % 
 % Args: 
@@ -14,6 +14,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
 %    o: volume of compartments, size(n_comp)
 %    s: stochiometry matrix: (n_species, n_comp, n_reactions)
 %    k: forward and backward rates, n_reaction x 2.
+%    r: resitivity (for ionic current) between compartments. size(n_comp,n_comp).
+%       the default value should be inf, and this needs to be a symmetric matrix, 
+%       with inf diagonal. 
 
 
     f = @fun;
@@ -44,6 +47,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
     assert(ismatrix(o) && length(o) == n_comp, 'length of compartment volume o must be n_comp');
     
     assert(length(o) ==  n_comp && ismatrix(o), 'volume vector must have the same length as n_comp');
+    assert(ismatrix(cap) && size(cap,1) == n_comp && size(cap,1) == size(cap,2), ...
+        'capacitance must be a square matrix with sides = n_comp');
+    
     
     % the mobile valences, these are species
     % which can either diffuse or are actively pumped between compartments.
@@ -118,8 +124,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k)
         
         %fprintf('dcdt both: %d \n', dcdt_v(273));
         
-        dvdt_v  = dvdt(a, z, j, cap);
-        %dvdt_v = zeros(n_comp, 1);
+        dvdt_v  = dvdt(a, z, j, dvdt_inv, v, r);
+        %disp(dvdt_v);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);
         state((n_comp*n_species)+1:end) = dvdt_v;

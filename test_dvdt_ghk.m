@@ -1,32 +1,21 @@
-function [] = test_dvdt3()
-% A 3 compartment system, equiv of a two coupled RC circuits. 
+function [] = test_dvdt_ghk()
+% A single compartment system, equiv of a single RC circuit. 
 
-    n_comp = 3;
+    n_comp = 2;
 
-    %cap = abs(eye(n_comp)-1) * 0.1;
-    cap = zeros(n_comp);
-    cap(1,2) = 0.1;
-    cap(2,3) = 0.1;
-    cap = cap + triu(cap)';
+    cap = abs(eye(n_comp)-1) * 0.1;
 
     a = zeros(n_comp);
     a(1,2) = 1;
-    a(2,3) = 1;
-    a(1,3) = 1;
     % make symmetric
     a = a' + triu(a,1);
 
     z = 1;
     j = zeros(1,n_comp, n_comp);
     j(1,1,2) = 1;
-    j(1,3,1) = 1;
 
     % resistance:
-    r = inf(n_comp);
-    r(1,2) = 1;
-    r(2,3) = 1;
-    r(1,3) = 1;
-    r = triu(r) + triu(r,1)';
+    r = ones(n_comp) * 1;
     global F;
 
     F = 1;
@@ -43,7 +32,7 @@ function [] = test_dvdt3()
     dvdt_inv = inv(dvdt_inv);
     assert(all(all(isfinite(dvdt_inv))), 'capacitance matrix is not invertable');
 
-    v0 = [0 -1 5]';
+    v0 = [0 -1]';
 
 
 
@@ -59,4 +48,17 @@ function [] = test_dvdt3()
     [t,y] = ode45(@fun,[0 1], v0);
     
     plot(t,y);
+
+end
+
+function [j] = ghk_flux(v, c0, c1)   
+    R = 1;
+    T = 1;
+    ev = exp((-v.* z) * F / R / T); 
+    
+
+
+    a = (((z * F).^2) .* v) / R * T;
+    b = (c1 - c0 .* ev) ./ (1 - ev);
+    j = -a .* b;
 end
