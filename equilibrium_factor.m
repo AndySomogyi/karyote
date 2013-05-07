@@ -21,7 +21,6 @@ function [e] = equilibrium_factor(c,z,v,l)
                 % deal with zero and non zero valences
                 ll = l(a1,a2);
                 dv = v(a1)-v(a2);
-                %dv = -dv;
                 q = F * z * (dv) / (ll * R * T);
                 nzi = logical(q ~= 0);
                 zi = logical(q == 0);
@@ -37,13 +36,13 @@ end
 function [e] = non_zero_q(q, c1, c2, l)
     if ~isempty(q) > 0
         eql = exp(q * l);            
-        e = q .* (c1' - c2' .* eql ) ./ (1-eql);
+        e = q .* (c2' - c1' .* eql ) ./ (1-eql);
     else
         e = zeros(size(c1));
     end
 end
 
 function [e] = zero_q(c1, c2, l)
-    e = (c2 - c1)/l;
+    e = (c1 - c2)/l;
 end
 

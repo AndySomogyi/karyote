@@ -120,11 +120,12 @@ function [ f ] = odefun(cap, a, l, h, z, o, s, k, r)
             dcdt_trans(:,kk) = sum(jn(:,:,kk), 2) / o(kk);
         end
                 
-        dcdt_v = dcdt_v - reshape(dcdt_trans, size(dcdt_v));
+        dcdt_v = dcdt_v + reshape(dcdt_trans, size(dcdt_v));
         
         %fprintf('dcdt both: %d \n', dcdt_v(273));
         
         dvdt_v  = dvdt(a, z, j, dvdt_inv, v, r);
+        %dvdt_v = zeros(size(v));
         %disp(dvdt_v);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);

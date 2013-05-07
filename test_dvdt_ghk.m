@@ -45,20 +45,31 @@ function [] = test_dvdt_ghk()
         state = dvdt(a,z,j,dvdt_inv, state, r);
     end
 
-    [t,y] = ode45(@fun,[0 1], v0);
+    %[t,y] = ode45(@fun,[0 1], v0);
     
-    plot(t,y);
+    %plot(t,y);
+    
+    z = 1;
+    v = [0 1];
+    c = [0 1];
+    j = ghk_flux(z,v(1) - v(2), c(1), c(2));
+    disp(j);
 
 end
 
-function [j] = ghk_flux(v, c0, c1)   
+function [j] = ghk_flux(z, v, c0, c1)   
     R = 1;
     T = 1;
-    ev = exp((-v.* z) * F / R / T); 
+    F = 1;
     
+    if v ~= 0
+        ev = exp((-v.* z) * F / R / T); 
 
 
-    a = (((z * F).^2) .* v) / R * T;
-    b = (c1 - c0 .* ev) ./ (1 - ev);
-    j = -a .* b;
+
+        a = (((z * F).^2) .* v) / R * T;
+        b = (c0 - c1 .* ev) ./ (1 - ev);
+        j = -a .* b;
+    else
+    end
 end

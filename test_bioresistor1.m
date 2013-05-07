@@ -1,6 +1,6 @@
 % set the global constants
 global F R T
-F= 96485.3365; R=8.3144621; T=300;
+F= 9.64853399e4; R=8.3144621; T=300;
 
 % 
 % 
@@ -11,7 +11,7 @@ n_reactions = 1;
 
 % concentration, n_species, n_comp
 % each column is a compartment, each row in the column is a species.
-c0 = [0 1]  * 1e-5;
+c0 = [0 1]  * 1e-6;
 
   
 % stoichiometry matrix n_species, n_comp, n_reactions
@@ -25,13 +25,14 @@ k = zeros(n_reactions,2);
 z = [1];
 
 % initial compartment voltage
-v = [0, 0];
+v = [0, 1];
 
 cap = abs(eye(n_comp,n_comp) - 1);
 
 a = abs(eye(n_comp,n_comp) - 1);
 l = abs(eye(n_comp,n_comp) - 1);
 o = ones(n_comp, 1);
+o(1) = inf;
 
 r = inf(n_comp,n_comp);
 
@@ -43,7 +44,7 @@ fun = odefun(cap, a, l, h, z, o, s, k, r);
 
 state = karyote_pack(c0,v);
 
-[t,y] = ode15s(fun, [0 .2], state);
+[t,y] = ode15s(fun, [0 2], state);
 
 c = y(:,1:(n_species*n_comp));
 v = y(:,(n_species*n_comp)+1:end);
