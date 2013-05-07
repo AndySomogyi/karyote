@@ -2,28 +2,29 @@
 global F R T
 F= 9.64853399e4; R=8.3144621; T=300;
 
-% 
-% 
-
 n_comp = 2;
 n_species = 1;
 n_reactions = 0;
-n_trans_reactions = 0;
+n_trans_reactions = 3;
 
 % concentration, n_species, n_comp
 % each column is a compartment, each row in the column is a species.
 c0 = [0 1]  * 5.2e-6;
 
-  
 % stoichiometry matrix n_species, n_comp, n_reactions
 si = zeros(n_species, n_comp, n_reactions);
 st = zeros(n_species, n_comp, n_trans_reactions);
+
+st(1,1,1) = -1;
+st(1,2,1) = 1;
+
+st(1,2,2) = -1;
+st(1,1,2) = 1;
 
 % forward and backward rate constants, 
 % n_reactions, 2.
 ki = zeros(n_reactions,2);
 kt = zeros(n_trans_reactions,2);
-
 
 % valences, each species has same valence everywhere, n_species.
 z = [1];
