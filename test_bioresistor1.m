@@ -11,7 +11,7 @@ n_reactions = 1;
 
 % concentration, n_species, n_comp
 % each column is a compartment, each row in the column is a species.
-c0 = [0 1]  * 1e-6;
+c0 = [0 1]  * 5.2e-6;
 
   
 % stoichiometry matrix n_species, n_comp, n_reactions
