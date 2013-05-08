@@ -1,4 +1,5 @@
 % set the global constants
+% test
 global F R T
 F= 96485.3365; R=8.3144621; T=300;
 
