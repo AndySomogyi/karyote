@@ -1,3 +1,4 @@
+%% Get mitochondira concentrations working.
 % set the global constants
 global F R T
 F= 9.64853399e4; R=8.3144621; T=300;
