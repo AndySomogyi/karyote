@@ -715,9 +715,6 @@ c(115,4) = 4.668955e-3;
 % initial values for compartment potentials. 
 v(:) = 0;
 
-% atom count
-ac(1) = 
-ac(2)
 
 verify_stochiometry(si, z);
 
