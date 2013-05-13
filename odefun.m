@@ -47,12 +47,12 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         sii = squeeze(st(:,ii,:)) < 0;
         for jj=1:n_comp
             if ii ~= jj
-                % permeable ions
+                % permeable ions between ii and jj (column vec)
                 perm_mobi = logical(h(:,ii,jj) > 0);
                 % all the trans products in comp jj
                 sjj = squeeze(st(:,jj,:)) > 0;
                 % ions that were pumped from ii to jj
-                trans_mobi = any(sii & sjj, 1);
+                trans_mobi = any(sii & sjj, 2);
 
                 mobi = perm_mobi | trans_mobi;
 
