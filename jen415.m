@@ -7,8 +7,8 @@ F= 96485.3365; R=8.3144621; T=300;
 % diplaying of the value..
 n_comp = 4;
 n_species = 115;
-n_intra_reactions = 0;
-n_trans_reactions = 0;
+n_intra_reactions = 44;
+n_trans_reactions = 1;
 
 % first make empty (zero) matricies to store the parameters, 
 % easier this way as most parameters are zero.
@@ -35,22 +35,26 @@ z = zeros(1,n_species);
 %    o: volume of compartments, size(n_comp)
 o = zeros(1,n_comp);
 
-%    nu: = stoichiometric coefficient of species i for reaction k in
-%        compartment a. dims: nspecies, n_species x ncomp x n_reactions
+%    intra-compartment stoichiometry matrix, 
+%    stoichiometric coefficient of species i for reaction k in
+%    compartment a. size: nspecies, n_species x ncomp x n_reactions
 si = zeros(n_species, n_comp, n_intra_reactions);
 
-%    nu: = stoichiometric coefficient of species i for reaction k in
-%        compartment a. dims: nspecies, n_species x ncomp x n_reactions
+%    trans-compartment stoichiometry matrix, 
+%    stoichiometric coefficient of species i for reaction k in
+%    compartment a. size: nspecies, n_species x ncomp x n_reactions
 st = zeros(n_species, n_comp, n_intra_reactions);
 
 %    mu_ref: reference chemical potentail for species i in compartment a, 
 %        size(n_comp, n_species)
 mu_ref = zeros(n_comp, n_species);
 
-%    k: rate (n_reaction, rate direction), 1 = forward, 2 = reverse
+%    ki: intra-compartment reaction rates,
+%    size: (n_reaction, rate direction), 1 = forward, 2 = reverse
 ki = zeros(n_intra_reactions, 2);
 
-%    k: rate (n_reaction, rate direction), 1 = forward, 2 = reverse
+%    kt: trans-compartment reaction rates,
+%    size: (n_reaction, rate direction), 1 = forward, 2 = reverse
 kt = zeros(n_trans_reactions, 2);
 
 %    concentration inside c(n_species, n_comp)
@@ -214,162 +218,162 @@ o(:) = [2.0e-7 7.0e07 1.6e-04, Inf];
 
 %% stoichometry of intra-compartment reactions, indexing: nspecies x ncomp x nreactions
 % 1-34 are fast rxns, 35-44 are slow rxns (fast and slow are intracomparmental) 
-%si(106,4,1) = -1;
-%si(104,4,1) = -1;
-%si(107,4,1) =  1;
-%si(34,4,2) = -1;
-%si(35,4,2) = -1;
-%si(33,4,2) =  1;
-%si(36,4,2) =  1;
-%si(36,4,3) = -1;
-%si(11,4,3) = -1;
-%si(37,4,3) =  1;
-%si(1,4,3) =  1;
-%si(37,4,4) = -1;
-%si(39,4,4) = -1;
-%si(35,4,4) =  1;
-%si(38,4,4) =  1;
-%si(38,4,5) = -1;
-%si(14,4,5) = -1;
-%si(39,4,5) =  1;
-%si(15,4,5) =  1;
-%si(27,4,5) =  1;
-%si(40,4,6) = -1;
-%si(31,4,6) = -1;
-%si(41,4,6) =  1;
-%si(41,4,7) = -1;
-%si(24,4,7) = -1;
-%si(43,4,7) =  1;
-%si(44,4,8) = -1;
-%si(42,4,8) =  1;
-%si(25,4,8) =  1;
-%si(42,4,9) = -1;
-%si(40,4,9) =  1;
-%si(30,4,9) =  1;
-%si(45,4,10) = -1;
-%si(10,4,10) = -1;
-%si(46,4,10) =  1;
-%si(46,4,11) = -1;
-%si(1,4,11) = -1;
-%si(47,4,11) = 1;
-%si(48,4,12) = -1;
-%si(45,4,12) = 1;
-%si(2,4,12) = 1;
-%si(49,4,13) = -1;
-%si(2,4,13) = -1;
-%si(50,4,13) = 1;
-%si(51,4,14) = -1;
-%si(29,4,14) = -1;
-%si(49,4,14) = 1;
-%si(4,4,14) = 1;
-%si(52,4,15) = -1;
-%si(14,4,15) = -1;
-%si(53,4,15) =  1;
-%si(53,4,16) = -1;
-%si(102,4,16) = -1;
-%si(54,4,16) = 1;
-%si(55,4,17) = -1;
-%si(52,4,17) = 1;
-%si(15,4,17) = 1;
-%si(104,4,17) = 2;
-%si(56,4,18) = -1;
-%si(104,4,18) = -1;
-%si(105,4,18) = 1;
-%si(57,4,19) = -1;
-%si(58,4,19) = -1;
-%si(105,4,19) = 1;
-%si(59,4,19) = 1;
-%si(59,4,20) = -1;
-%si(11,4,20) = -1;
-%si(60,4,20) = 1;
-%si(6,4,20) = 1;
-%si(60,4,21) = -1;
-%si(62,4,21) = -1;
-%si(58,4,21) = 1;
-%si(61,4,21) = 1;
-%si(61,4,22) = -1;
-%si(14,4,22) = -1;
-%si(62,4,22) = 1;
-%si(15,4,22) = 1;
-%si(27,4,22) = 1;
-%si(63,4,23) = -1;
-%si(6,4,23) = -1;
-%si(64,4,23) = 1;
-%si(65,4,24) = -1;
-%si(66,4,24) = 1;
-%si(7,4,24) = 1;
-%si(66,4,25) = -1;
-%si(24,4,25) = -1;
-%si(63,4,25) = 1;
-%si(23,4,25) = 1;
-%si(70,4,26) = -1;
-%si(8,4,26) = -1;
-%si(71,4,26) = 1;
-%si(72,4,27) = -1;
-%si(70,4,27) = 1;
-%si(9,4,27) = 1;
-%si(73,4,28) = -1;
-%si(14,4,28) = -1;
-%si(74,4,28) = 1;
-%si(74,4,29) = -1;
-%si(9,4,29) = -1;
-%si(75,4,29) = 1;
-%si(76,4,30) = -1;
-%si(78,4,30) = 1;
-%si(10,4,30) = 1;
-%si(78,4,31) = -1;
-%si(73,4,31) = 1;
-%si(15,4,31) = 1;
-%si(27,4,31) = 1;
-%si(19,4,32) = -1;
-%si(18,4,32) = 1;
-%si(27,4,32) = 1;
-%si(23,4,33) = -1;
-%si(77,4,33) = -1;
-%si(30,4,33) = 1;
-%si(24,4,34) = -1;
-%si(77,4,34) = -1;
-%si(31,4,34) = 1;
-%si(107,4,35) = -1;
-%si(108,4,35) = -1;
-%si(106,4,35) = 1;
-%si(26,4,35) = 1;
-%si(33,4,35) = 1;
-%si(104,4,35) = 1;
-%si(18,4,36) = -1;
-%si(33,4,36) = -1;
-%si(27,4,36) = -1;
-%si(20,4,36) = 1;
-%si(34,4,36) = 1;
-%si(43,4,37) = -1;
-%si(44,4,37) = 1;
-%si(47,4,38) = -1;
-%si(48,4,38) = 1;
-%si(101,4,38) = 1;
-%si(27,4,38) = 2;
-%si(50,4,39) = -1;
-%si(51,4,39) = 1;
-%si(29,4,39) = 1;
-%si(54,4,40) = -1;
-%si(104,4,40) = -2;
-%si(55,4,40) = 1;
-%si(5,4,40) = 1;
-%si(32,4,40) = 1;
-%si(27,4,40) = 2;
-%si(77,4,40) = 1;
-%si(5,4,41) = -1;
-%si(105,4,41) = -1;
-%si(57,4,41) = 1;
-%si(20,4,41) = 1;
-%si(64,4,42) = -1;
-%si(26,4,42) = -1;
-%si(65,4,42) = 1;
-%si(11,4,42) = 1;
-%si(71,4,43) = -1;
-%si(29,4,43) = -1;
-%si(72,4,43) = 1;
-%si(75,4,44) = -1;
-%si(76,4,44) = 1;
+si(106,4,1) = -1;
+si(104,4,1) = -1;
+si(107,4,1) =  1;
+si(34,4,2) = -1;
+si(35,4,2) = -1;
+si(33,4,2) =  1;
+si(36,4,2) =  1;
+si(36,4,3) = -1;
+si(11,4,3) = -1;
+si(37,4,3) =  1;
+si(1,4,3) =  1;
+si(37,4,4) = -1;
+si(39,4,4) = -1;
+si(35,4,4) =  1;
+si(38,4,4) =  1;
+si(38,4,5) = -1;
+si(14,4,5) = -1;
+si(39,4,5) =  1;
+si(15,4,5) =  1;
+si(27,4,5) =  1;
+si(40,4,6) = -1;
+si(31,4,6) = -1;
+si(41,4,6) =  1;
+si(41,4,7) = -1;
+si(24,4,7) = -1;
+si(43,4,7) =  1;
+si(44,4,8) = -1;
+si(42,4,8) =  1;
+si(25,4,8) =  1;
+si(42,4,9) = -1;
+si(40,4,9) =  1;
+si(30,4,9) =  1;
+si(45,4,10) = -1;
+si(10,4,10) = -1;
+si(46,4,10) =  1;
+si(46,4,11) = -1;
+si(1,4,11) = -1;
+si(47,4,11) = 1;
+si(48,4,12) = -1;
+si(45,4,12) = 1;
+si(2,4,12) = 1;
+si(49,4,13) = -1;
+si(2,4,13) = -1;
+si(50,4,13) = 1;
+si(51,4,14) = -1;
+si(29,4,14) = -1;
+si(49,4,14) = 1;
+si(4,4,14) = 1;
+si(52,4,15) = -1;
+si(14,4,15) = -1;
+si(53,4,15) =  1;
+si(53,4,16) = -1;
+si(102,4,16) = -1;
+si(54,4,16) = 1;
+si(55,4,17) = -1;
+si(52,4,17) = 1;
+si(15,4,17) = 1;
+si(104,4,17) = 2;
+si(56,4,18) = -1;
+si(104,4,18) = -1;
+si(105,4,18) = 1;
+si(57,4,19) = -1;
+si(58,4,19) = -1;
+si(105,4,19) = 1;
+si(59,4,19) = 1;
+si(59,4,20) = -1;
+si(11,4,20) = -1;
+si(60,4,20) = 1;
+si(6,4,20) = 1;
+si(60,4,21) = -1;
+si(62,4,21) = -1;
+si(58,4,21) = 1;
+si(61,4,21) = 1;
+si(61,4,22) = -1;
+si(14,4,22) = -1;
+si(62,4,22) = 1;
+si(15,4,22) = 1;
+si(27,4,22) = 1;
+si(63,4,23) = -1;
+si(6,4,23) = -1;
+si(64,4,23) = 1;
+si(65,4,24) = -1;
+si(66,4,24) = 1;
+si(7,4,24) = 1;
+si(66,4,25) = -1;
+si(24,4,25) = -1;
+si(63,4,25) = 1;
+si(23,4,25) = 1;
+si(70,4,26) = -1;
+si(8,4,26) = -1;
+si(71,4,26) = 1;
+si(72,4,27) = -1;
+si(70,4,27) = 1;
+si(9,4,27) = 1;
+si(73,4,28) = -1;
+si(14,4,28) = -1;
+si(74,4,28) = 1;
+si(74,4,29) = -1;
+si(9,4,29) = -1;
+si(75,4,29) = 1;
+si(76,4,30) = -1;
+si(78,4,30) = 1;
+si(10,4,30) = 1;
+si(78,4,31) = -1;
+si(73,4,31) = 1;
+si(15,4,31) = 1;
+si(27,4,31) = 1;
+si(19,4,32) = -1;
+si(18,4,32) = 1;
+si(27,4,32) = 1;
+si(23,4,33) = -1;
+si(77,4,33) = -1;
+si(30,4,33) = 1;
+si(24,4,34) = -1;
+si(77,4,34) = -1;
+si(31,4,34) = 1;
+si(107,4,35) = -1;
+si(108,4,35) = -1;
+si(106,4,35) = 1;
+si(26,4,35) = 1;
+si(33,4,35) = 1;
+si(104,4,35) = 1;
+si(18,4,36) = -1;
+si(33,4,36) = -1;
+si(27,4,36) = -1;
+si(20,4,36) = 1;
+si(34,4,36) = 1;
+si(43,4,37) = -1;
+si(44,4,37) = 1;
+si(47,4,38) = -1;
+si(48,4,38) = 1;
+si(101,4,38) = 1;
+si(27,4,38) = 2;
+si(50,4,39) = -1;
+si(51,4,39) = 1;
+si(29,4,39) = 1;
+si(54,4,40) = -1;
+si(104,4,40) = -2;
+si(55,4,40) = 1;
+si(5,4,40) = 1;
+si(32,4,40) = 1;
+si(27,4,40) = 2;
+si(77,4,40) = 1;
+si(5,4,41) = -1;
+si(105,4,41) = -1;
+si(57,4,41) = 1;
+si(20,4,41) = 1;
+si(64,4,42) = -1;
+si(26,4,42) = -1;
+si(65,4,42) = 1;
+si(11,4,42) = 1;
+si(71,4,43) = -1;
+si(29,4,43) = -1;
+si(72,4,43) = 1;
+si(75,4,44) = -1;
+si(76,4,44) = 1;
 
 
 %% stoichiomery matrix for trans compartment reactions 
@@ -546,6 +550,8 @@ ki(41,1) = 1.7314583e7;
 ki(42,1) = 3.266667e6;
 ki(43,1) = 9.7e5;
 ki(44,1) = 5.47857e5;
+
+
 ki(45,1) = 1.22e5;
 ki(46,1) = 1.0e11;
 ki(47,1) = 1.0e11;
@@ -577,11 +583,6 @@ ki(72,1) = 1.0e11;
 ki(73,1) = 1.0e11;
 ki(74,1) = 1.0e5;
 ki(:,2) = 1.0e-2;
-
-ki = ki(1:44,:);
-
-% we're ignoring reactions, just to get started, so make it zeros.
-ki = zeros(n_intra_reactions, 2);
 
 %% concentration inside c(n_comp x n_species)
 % this should actually be n_species, n_comp, but already writen
@@ -742,7 +743,7 @@ yp0 = zeros(size(state));
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-tf = 0.0000001;
+tf = 0.000003;
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...
 %                 'AbsTol', 1e-30, ...
