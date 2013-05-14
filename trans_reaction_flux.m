@@ -1,4 +1,4 @@
-function [flux] = trans_reaction_flux(c, s, k, z, v, o, a)
+function [flux] = trans_reaction_flux(c, s, k, ~, ~, o, ~)
 % trans compartment reaction rate via mass action.
 % c: concentration size: (single column vector of n_species * n_comp)
 %    organized by compartment, then species, 
