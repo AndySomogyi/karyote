@@ -8,7 +8,7 @@ F= 96485.3365; R=8.3144621; T=300;
 n_comp = 4;
 n_species = 115;
 n_intra_reactions = 44;
-n_trans_reactions = 1;
+n_trans_reactions = 30;
 
 % first make empty (zero) matricies to store the parameters, 
 % easier this way as most parameters are zero.
@@ -503,6 +503,8 @@ st(112,4,30) = 1;
 st(104,2,30) = 1;
 st(17,3,30) = 3;
 
+st(:) = 0;
+
 
 %% Intra-Compartment Reaction Rate Constants
 % (n_intra_reactions, 2)
@@ -748,7 +750,8 @@ yp0 = zeros(size(state));
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-tf = 0.000003;
+%tf = 0.000003;
+tf = 0.00000001;
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...
 %                 'AbsTol', 1e-30, ...

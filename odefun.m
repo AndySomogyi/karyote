@@ -120,7 +120,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
-        j = j + trans_reaction_flux(c, st, kt, z, v);
+        %j = j + trans_reaction_flux(c, st, kt, z, v);
         
         jn = charge_neutral_flux(j, z_mobi);
         
