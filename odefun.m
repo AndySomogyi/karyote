@@ -34,6 +34,11 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
     n_reactions = size(si, 3);
     n_trans_reactions = size(st, 3);
     
+    assert(n_reactions == size(ki, 1), ...
+        'intra compartment stoichometry matrix size does not agree with intra compartment reaction rate size');
+    assert(n_trans_reactions == size(kt, 1), ...
+        'trans compartment stoichometry matrix size does not agree with trans compartment reaction rate size');
+    
     fprintf('creating system for %i species, %i compartments, %i reactions\n', ...
         n_species, n_comp, n_reactions);
     
@@ -83,6 +88,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
     assert(length(o) ==  n_comp && ismatrix(o), 'volume vector must have the same length as n_comp');
     assert(ismatrix(cap) && size(cap,1) == n_comp && size(cap,1) == size(cap,2), ...
         'capacitance must be a square matrix with sides = n_comp');
+    % check stochiometry matricies
+    
+    
    
     
     % calculate the inverse of the capacitance matrix. 
@@ -120,9 +128,9 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
-        %j = j + trans_reaction_flux(c, st, kt, z, v);
+        j = j + trans_reaction_flux(c, st, kt, z, v);
         
-        jn = charge_neutral_flux(j, z_mobi);
+        jn = charge_neutral_flux(j, z);
         
        
         dcdt_v = intra_reaction_rate(c, si, ki, z, v);
@@ -137,8 +145,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         
         %fprintf('dcdt both: %d \n', dcdt_v(273));
         
-        dvdt_v  = dvdt(a, z, j, dvdt_inv, v, r);
-        %dvdt_v = zeros(size(v));
+        %dvdt_v  = dvdt(a, z, j, dvdt_inv, v, r);
+        dvdt_v = zeros(size(v));
         %disp(dvdt_v);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);
