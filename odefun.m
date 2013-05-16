@@ -39,8 +39,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
     assert(n_trans_reactions == size(kt, 1), ...
         'trans compartment stoichometry matrix size does not agree with trans compartment reaction rate size');
     
-    fprintf('creating system for %i species, %i compartments, %i reactions\n', ...
-        n_species, n_comp, n_reactions);
+    fprintf('creating system for %i species, %i compartments, %i reactions, %i trans reactions\n', ...
+        n_species, n_comp, n_reactions, n_trans_reactions);
     
         
     % the mobile valences, these are species
