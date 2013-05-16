@@ -1,9 +1,9 @@
 function [ j ] = charge_neutral_flux(j, z)
+% Calculate the charge neutral component of a transmembrane flux. 
+% Any excess charged flux is removed.
 % j: total flux, n_species x n_comp x n_comp
 % z: is the vector of valences, dims: 1 x n_species
 
-% concentration, n_species, n_comp
-% z: 1,n_species;
     n_comp = size(j,2);
     zp = zeros(size(z));
     zn = zeros(size(z));
@@ -37,12 +37,13 @@ function [ j ] = charge_neutral_flux(j, z)
                 j(in,i,k) = s * jj(in);
             end
             
+            % the total charge caried by this flux, calculated with the
+            % real valence vector, this had better be zero, or very near.
             q = z * j(:,i,k);
             
             if abs(q) > 1e-15
                 error('death and horror!, charge neutral flux not reached, q:%d\n', q);
             end
-          
         end
     end
 end
