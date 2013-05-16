@@ -4,42 +4,45 @@ function [ j ] = charge_neutral_flux(j, z)
 
 % concentration, n_species, n_comp
 % z: 1,n_species;
-    n_comp = length(z);
+    n_comp = size(j,2);
     zp = zeros(size(z));
-    lp = logical(z > 0);
-    zp(lp) = z(lp);
     zn = zeros(size(z));
-    ln = logical(z < 0);
-    zn(ln) = z(ln);
-    
+        
     for i = 1:n_comp
         for k=1:n_comp
-            qp =  zp * abs(j(:,i,k));
-            qn = -zn * abs(j(:,i,k));
+            jj=j(:,i,k);
+            ip1 = logical(jj > 0 & z' > 0); 
+            ip2 = logical(jj < 0 & z' < 0);
+            ip = ip1 | ip2;
+            in1 = logical(jj > 0 & z' < 0);
+            in2 = logical(jj < 0 & z' > 0);
+            in = in1 | in2;
+            
+            zp(:) = 0;
+            zp(ip1) =  z(ip1);
+            zp(ip2) =  z(ip2);
+            
+            zn(:) = 0;
+            zn(in1) = -z(in1);
+            zn(in2) = -z(in2);
+            
+            qp =  zp * jj;
+            qn =  zn * jj;
                         
             if qp > qn
                 s = qn / qp;
-                j(lp,i,k) = s * j(lp,i,k);
+                j(ip,i,k) = s * jj(ip);
             elseif qn > qp
                 s = qp / qn;
-                j(ln,i,k) = s * j(ln,i,k);
+                j(in,i,k) = s * jj(in);
             end
             
-            if z * abs(j(:,i,k)) > 1e-25
-                qp =  zp * abs(j(:,i,k));
-                qn = -zn * abs(j(:,i,k));
-
-                if qp > qn
-                    s = qn / qp;
-                    j(lp,i,k) = s * j(lp,i,k);
-                elseif qn > qp
-                    s = qp / qn;
-                    j(ln,i,k) = s * j(ln,i,k);
-                end
-                if z * abs(j(:,i,k)) > 1e-25
-                    error('oh the horror, charge neutrality not reached, q: %d', z * abs(j(:,i,k)));
-                end
+            q = z * j(:,i,k);
+            
+            if abs(q) > 1e-15
+                error('death and horror!, charge neutral flux not reached, q:%d\n', q);
             end
+          
         end
     end
 end

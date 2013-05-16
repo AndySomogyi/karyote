@@ -38,11 +38,11 @@ st(2,2,1) = 1;
 ki = zeros(n_reactions,2);
 
 kt = zeros(n_trans_reactions,2);
-kt(1,1) = 0;
+kt(1,1) = 0.01;
 kt(1,2) = 0;
 
 % initial compartment voltage
-v = [ 0    0.6377];
+v = [ 0    0];
 
 cap = abs(eye(n_comp,n_comp) - 1) * 1e3;
 
@@ -62,7 +62,7 @@ fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 state = karyote_pack(c0,v);
 
 options = odeset('NonNegative', 1:(n_species*n_comp)); 
-[t,y] = ode45(fun, [0 10], state, options);
+[t,y] = ode45(fun, [0 1], state, options);
 
 c = y(:,1:(n_species*n_comp));
 v = y(:,(n_species*n_comp)+1:end);

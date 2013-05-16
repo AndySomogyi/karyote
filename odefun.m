@@ -126,6 +126,13 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         % voltage vector, n_comp x 1
         v = state((n_comp*n_species)+1:end);
         
+        % verify charge neutrality
+        q = kron(ones(1,n_comp), z) * c;
+        
+        if abs(q) > 1e-3
+            error('death and horror!, charge neutrality not maintained, q:%d\n', q);
+        end
+        
         e = equilibrium_factor(c,z,v,l);
         j(:) = membrane_flux( h,e );
         j = j + trans_reaction_flux(c, st, kt, z, v);
@@ -145,8 +152,8 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         
         %fprintf('dcdt both: %d \n', dcdt_v(273));
         
-        %dvdt_v  = dvdt(a, z, j, dvdt_inv, v, r);
-        dvdt_v = zeros(size(v));
+        dvdt_v  = dvdt(a, z, j, dvdt_inv, v, r);
+        %dvdt_v = zeros(size(v));
         %disp(dvdt_v);
         
         state(1:(n_comp*n_species)) = reshape(dcdt_v, [1,(n_comp*n_species)]);

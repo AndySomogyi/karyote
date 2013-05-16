@@ -43,7 +43,7 @@ si = zeros(n_species, n_comp, n_intra_reactions);
 %    trans-compartment stoichiometry matrix, 
 %    stoichiometric coefficient of species i for reaction k in
 %    compartment a. size: nspecies, n_species x ncomp x n_reactions
-st = zeros(n_species, n_comp, n_intra_reactions);
+st = zeros(n_species, n_comp, n_trans_reactions);
 
 %    mu_ref: reference chemical potentail for species i in compartment a, 
 %        size(n_comp, n_species)
