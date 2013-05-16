@@ -736,6 +736,17 @@ v0(:) = 0;
 
 verify_stochiometry(si, z);
 
+%% Run the simulation
+
+% load the initial conditions from a file
+% this reads a given filename, and populates the 
+% variables 'c0' and 'v0' with the values stored 
+% in the file. 
+% notes: the mat file must contain the variables c0 and v0.
+% load overwrites whatever the current value of c0 and v0
+% with the values stored in the file. 
+load('newlonger.mat');
+
 % make the function that the integrator calls. 
 fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 
@@ -750,16 +761,17 @@ yp0 = zeros(size(state));
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-%tf = 0.000003;
-tf = 0.00000001;
+tf = 0.000001;
+
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...
 %                 'AbsTol', 1e-30, ...
 %                 'InitialStep', 0.01*abs(t0-tf));
 %[t,y] = ode15s(fun, [t0 tf], state, options);
 
-options = odeset('NonNegative', 1:(n_species*n_comp)); 
-[t,y] = ode45(fun, [t0, tf], state, options);
+options = odeset('NonNegative', 1:(n_species*n_comp), ...
+                 'InitialStep', 0.01*abs(t0-tf)); 
+[t,y] = ode15s(fun, [t0, tf], state, options);
 
 c = y(:,1:(n_species*n_comp));
 v = y(:,(n_species*n_comp)+1:end);
