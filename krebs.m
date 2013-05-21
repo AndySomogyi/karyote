@@ -437,6 +437,8 @@ c0(74,2) = 2.7e-5;
 c0(75,2) = 1.161e-3;
 c0(76,2) = 4.89e-3;
 
+c0 = neutralize_charge(c0, z);
+
 % voltage v(n_comp)
 % initial values for compartment potentials. 
 v0(:) = 0;
@@ -453,15 +455,12 @@ verify_stochiometry(si, z);
 % notes: the mat file must contain the variables c0 and v0.
 % load overwrites whatever the current value of c0 and v0
 % with the values stored in the file. 
-load('newlonger.mat');
 
 % make the function that the integrator calls. 
 fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 
 % pack the initial values into the state vector
 state = karyote_pack(c0,v0);
-
-yp0 = zeros(size(state));
 
 % test the function, call it once with the starting state vector. 
 %options = odeset('NonNegative', 1:length(state)-n_comp, ...
