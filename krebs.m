@@ -6,10 +6,10 @@ F= 96485.3365; R=8.3144621; T=300;
 % the semicolon at the end is not required, all it does is suppress 
 % diplaying of the value..
 % compartment 1 is ground and 2 is matrix
-n_comp = 2;
-n_species = 76;
+n_comp = 4;
+n_species = 82;
 n_intra_reactions = 42;
-n_trans_reactions = 0;
+n_trans_reactions = 8;
 
 % first make empty (zero) matricies to store the parameters, 
 % easier this way as most parameters are zero.
@@ -90,15 +90,12 @@ a = a' + triu(a,1);
 % default is infinitly thick membrane
 l(:) = Inf;
 
-l(1,2) = 2;
 l(2,1) = 2;
-
-
+l(1,2) = 2;
 
 %% permeability, (n_species, n_comp, n_comp) %%
 % diffuse from universe to into outer comp (1)
-h(18,  1,2) = 1;
-h(72, 1,2) = 1;
+h(18,1,2) = 1;
 
 %% valence of species %%
 z(2) = -3;
@@ -152,7 +149,6 @@ z(76) = -1;
 o(:) = [2.0e-7, Inf];
 
 %% stoichometry of intra-compartment reactions, indexing: nspecies x ncomp x nreactions
-% 1-34 are fast rxns, 35-44 are slow rxns (fast and slow are intracomparmental) 
 si(74,2,1) = -1;
 si(72,2,1) = -1;
 si(75,2,1) =  1;
@@ -306,51 +302,65 @@ si(22,2,42) = -1;
 si(68,2,42) = -1;
 si(27,2,42) = 1;
 
+%% stoichometry of transmembrane reactions, indexing: nspecies x ncomp x nreactions 
+st(18,1,1) = -1;
+st(24,1,1) = -1;
+st(18,2,1) =  1;
+st(24,2,1) =  1;
+st(72,1,2) = -2;
+st(72,2,2) =  2;
+
 %% Intra-Compartment Reaction Rate Constants
 % (n_intra_reactions, 2)
 % column 1 is forward rate, column 2 is back rate
-ki(1,1) = 1.0e1;
-ki(2,1) = 4.4693e2;
-ki(3,1) = 4.4693e2;
-ki(4,1) = 1.0e1;
-ki(5,1) = 1.0e1;
-ki(6,1) = 1.0e1;
-ki(7,1) = 1.0e1;
-ki(8,1) = 1.0e1;
-ki(9,1) = 1.0e1;
-ki(10,1) = 1.15473e5;
-ki(11,1) = 1.0e1;
-ki(12,1) = 1.0e1;
-ki(13,1) = 3.474e3;
-ki(14,1) = 1.0e1;
-ki(15,1) = 1.0e1;
-ki(16,1) = 1.0e1;
-ki(17,1) = 1.905286e6;
-ki(18,1) = 1.0e1;
-ki(19,1) = 1.0e1;
-ki(20,1) = 1.7314583e7;
-ki(21,1) = 1.0e1;
-ki(22,1) = 1.0e1;
-ki(23,1) = 1.0e1;
-ki(24,1) = 1.0e1;
-ki(25,1) = 1.0e1;
-ki(26,1) = 3.266667e6;
-ki(27,1) = 1.0e1;
-ki(28,1) = 1.0e1;
-ki(29,1) = 1.0e1;
-ki(30,1) = 1.0e1;
-ki(31,1) = 1.0e1;
-ki(32,1) = 1.0e1;
-ki(33,1) = 9.7e5;
-ki(34,1) = 1.0e1;
-ki(35,1) = 1.0e1;
-ki(36,1) = 1.0e1;
-ki(37,1) = 5.47857e5;
-ki(38,1) = 1.0e1;
-ki(39,1) = 1.0e1;
-ki(40,1) = 1.0e1;
-ki(41,1) = 1.0e1;
-ki(42,1) = 1.0e1;
+ki(1,1) = 1.0e9;
+ki(2,1) = 2.28e7;
+ki(3,1) = 1.84e6;
+ki(4,1) = 1.0e9;
+ki(5,1) = 1.0e9;
+ki(6,1) = 1.0e9;
+ki(7,1) = 1.0e9;
+ki(8,1) = 1.0e9;
+ki(9,1) = 1.0e9;
+ki(10,1) = 3.12e6;
+ki(11,1) = 1.0e9;
+ki(12,1) = 1.0e9;
+ki(13,1) = 9.43e6;
+ki(14,1) = 1.0e9;
+ki(15,1) = 1.0e9;
+ki(16,1) = 1.0e9;
+ki(17,1) = 1.36e4;
+ki(18,1) = 1.0e9;
+ki(19,1) = 1.0e9;
+ki(20,1) = 4.9e5;
+ki(21,1) = 1.0e9;
+ki(22,1) = 1.0e9;
+ki(23,1) = 1.0e9;
+ki(24,1) = 1.0e9;
+ki(25,1) = 1.0e9;
+ki(26,1) = 7.86e5;
+ki(27,1) = 1.0e9;
+ki(28,1) = 1.0e9;
+ki(29,1) = 2.83e5;
+ki(30,1) = 1.0e9;
+ki(31,1) = 1.0e9;
+ki(32,1) = 1.0e9;
+ki(33,1) = 8.62e4;
+ki(34,1) = 1.0e9;
+ki(35,1) = 1.0e9;
+ki(36,1) = 1.0e9;
+ki(37,1) = 1.73e8;
+ki(38,1) = 1.0e9;
+ki(39,1) = 1.0e9;
+ki(40,1) = 1.0e9;
+ki(41,1) = 1.0e9;
+ki(42,1) = 1.0e9;
+
+%% Trans-Compartment Reaction Rates,
+% (n_trans_reactions, 2)
+% column 1 is forward rate, column 2 is back rate
+kt(1,1) = 1.22e5;
+kt(2,1) = 1.0e5;
 
 %% concentration inside c(n_comp x n_species)
 % this should actually be n_species, n_comp, but already writen
@@ -358,6 +368,7 @@ ki(42,1) = 1.0e1;
 % we'll just take the transpose of it:)
 
 % first set each concentration to a very small value, can not be zero.
+% 1: ground, 2: matrix
 c0(18,1) = 2.3000052e-3;
 c0(19,1) = 1.87e-4;
 c0(24,1) = 5.20e-9;
@@ -442,7 +453,7 @@ c0 = neutralize_charge(c0, z);
 % voltage v(n_comp)
 % initial values for compartment potentials. 
 v0(:) = 0;
-
+v0(2) = -.04;
 
 verify_stochiometry(si, z);
 
@@ -477,7 +488,7 @@ tf = 0.0000001;
 %[t,y] = ode15s(fun, [t0 tf], state, options);
 
 options = odeset('NonNegative', 1:(n_species*n_comp), ...
-                 'InitialStep', 0.01*abs(t0-tf)); 
+                 'InitialStep', 0.0001*abs(t0-tf));
 [t,y] = ode15s(fun, [t0, tf], state, options);
 
 c = y(:,1:(n_species*n_comp));
