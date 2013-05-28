@@ -6,7 +6,7 @@ F= 96485.3365; R=8.3144621; T=300;
 % the semicolon at the end is not required, all it does is suppress 
 % diplaying of the value..
 % compartment 1 is ground and 2 is matrix
-n_comp = 4;
+n_comp = 2;
 n_species = 82;
 n_intra_reactions = 42;
 n_trans_reactions = 8;
