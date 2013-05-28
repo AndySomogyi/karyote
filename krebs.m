@@ -360,7 +360,7 @@ ki(42,1) = 1.0e9;
 % (n_trans_reactions, 2)
 % column 1 is forward rate, column 2 is back rate
 kt(1,1) = 1.22e5;
-kt(2,1) = 1.0e3;
+kt(2,1) = 2.5e2;
 
 %% concentration inside c(n_comp x n_species)
 % this should actually be n_species, n_comp, but already writen
@@ -471,6 +471,7 @@ verify_stochiometry(si, z);
 fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 
 % load initial conditions
+load('krebs.mat')
 
 
 % pack the initial values into the state vector
@@ -482,7 +483,7 @@ state = karyote_pack(c0,v0);
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-tf = 1e-7;
+tf = 8e-7;
 
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...
