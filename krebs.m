@@ -9,7 +9,7 @@ F= 96485.3365; R=8.3144621; T=300;
 n_comp = 2;
 n_species = 82;
 n_intra_reactions = 42;
-n_trans_reactions = 8;
+n_trans_reactions = 2;
 
 % first make empty (zero) matricies to store the parameters, 
 % easier this way as most parameters are zero.
@@ -146,7 +146,7 @@ z(75) =  2;
 z(76) = -1;
 
 %% volume of each compartment
-o(:) = [2.0e-7, Inf];
+o(:) = [Inf, 2.0e-7];
 
 %% stoichometry of intra-compartment reactions, indexing: nspecies x ncomp x nreactions
 si(74,2,1) = -1;
@@ -360,7 +360,7 @@ ki(42,1) = 1.0e9;
 % (n_trans_reactions, 2)
 % column 1 is forward rate, column 2 is back rate
 kt(1,1) = 1.22e5;
-kt(2,1) = 1.0e5;
+kt(2,1) = 1.0e3;
 
 %% concentration inside c(n_comp x n_species)
 % this should actually be n_species, n_comp, but already writen
@@ -453,7 +453,7 @@ c0 = neutralize_charge(c0, z);
 % voltage v(n_comp)
 % initial values for compartment potentials. 
 v0(:) = 0;
-v0(2) = -.04;
+v0(2) = 0;
 
 verify_stochiometry(si, z);
 
@@ -470,6 +470,9 @@ verify_stochiometry(si, z);
 % make the function that the integrator calls. 
 fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 
+% load initial conditions
+
+
 % pack the initial values into the state vector
 state = karyote_pack(c0,v0);
 
@@ -479,7 +482,7 @@ state = karyote_pack(c0,v0);
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-tf = 0.0000001;
+tf = 1e-7;
 
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...
@@ -488,7 +491,7 @@ tf = 0.0000001;
 %[t,y] = ode15s(fun, [t0 tf], state, options);
 
 options = odeset('NonNegative', 1:(n_species*n_comp), ...
-                 'InitialStep', 0.0001*abs(t0-tf));
+                 'InitialStep', 0.00001*abs(t0-tf));
 [t,y] = ode15s(fun, [t0, tf], state, options);
 
 c = y(:,1:(n_species*n_comp));
