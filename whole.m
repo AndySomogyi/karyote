@@ -6,10 +6,10 @@ F= 96485.3365; R=8.3144621; T=300;
 % the semicolon at the end is not required, all it does is suppress 
 % diplaying of the value..
 % compartment 1 is ground and 2 is matrix
-n_comp = 2;
-n_species = 82;
+n_comp = 3;
+n_species = 85;
 n_intra_reactions = 47;
-n_trans_reactions = 2;
+n_trans_reactions = 8;
 
 % first make empty (zero) matricies to store the parameters, 
 % easier this way as most parameters are zero.
@@ -81,7 +81,8 @@ cap(:) = 2e-04;
 
 % area between compartments, only compartments 1,2 are in contact, and
 % comps 2 and 3 are in contact. 
-a(1, 2) = 1.866e-4;
+a(1, 3) = 1.866e-4;
+a(2, 3) = 1.866e-4;
 
 % make symmetric
 a = a' + triu(a,1);
@@ -90,12 +91,16 @@ a = a' + triu(a,1);
 % default is infinitly thick membrane
 l(:) = Inf;
 
-l(2,1) = 2;
-l(1,2) = 2;
+l(3,1) = 4;
+l(2,3) = 2;
+
+l(1,3) = 4;
+l(3,2) = 2;
 
 %% permeability, (n_species, n_comp, n_comp) %%
 % diffuse from universe to into outer comp (1)
-
+h(85,2,3) = 1;
+h(85,3,2) = 1;
 
 %% valence of species %%
 z(2) = -3;
@@ -149,9 +154,12 @@ z(79) = -2;
 z(80) = -4;
 z(81) = -4;
 z(82) = -2;
+z(83) =  2;
+z(84) =  3;
+
 
 %% volume of each compartment
-o(:) = [Inf, 2.0e-7];
+o(:) = [Inf, 1.17e-6 1.6e-2];
 
 %% stoichometry of intra-compartment reactions, indexing: nspecies x ncomp x nreactions
 si(74,2,1) = -1;
@@ -328,6 +336,37 @@ st(18,2,1) =  1;
 st(24,2,1) =  1;
 st(72,1,2) = -2;
 st(72,2,2) =  2;
+st(27,2,3) = -1;
+st(23,2,3) = -1;
+st(24,3,3) = -4;
+st(26,2,3) =  1;
+st(24,2,3) =  4;
+st(22,3,4) = -1;
+st(21,2,4) = -1;
+st(22,2,4) =  1;
+st(21,3,4) =  1;
+st(15,2,5) = -1;
+st(12,2,5) = -1;
+st(24,2,5) = -5;
+st(13,2,5) =  1;
+st(24,3,5) =  4;
+st(14,2,5) =  1;
+st(13,2,6) = -1;
+st(84,3,6) = -2;
+st(24,2,6) = -2;
+st(12,2,6) =  1;
+st(83,3,6) =  1;
+st(24,3,6) =  4;
+st(83,3,7) = -4;
+st(24,2,7) = -8;
+st(85,2,7) = -1;
+st(84,3,7) =  4;
+st(25,2,7) =  2;
+st(24,3,7) =  4;
+st(72,2,8) = -1;
+st(17,3,8) = -3;
+st(72,3,8) =  1;
+st(17,2,8) =  3;
 
 %% Intra-Compartment Reaction Rate Constants
 % (n_intra_reactions, 2)
@@ -383,8 +422,23 @@ ki(47,1) = 1.0e9;
 %% Trans-Compartment Reaction Rates,
 % (n_trans_reactions, 2)
 % column 1 is forward rate, column 2 is back rate
-kt(1,1) = 1.22e5;
-kt(2,1) = 2.5e2;
+%kt(1,1) = 9.23e3;
+%kt(2,1) = 2e1;
+%kt(3,1) = 4.76e3;
+%kt(4,1) = 6.76e6;
+%kt(5,1) = 7.34e5;
+%kt(6,1) = 1.03e6;
+%kt(7,1) = 4e7;
+%kt(8,1) = 1.0e1;
+
+%kt(1,1) = 9.23e3;
+%kt(2,1) = 2e1;
+%kt(3,1) = 4.76e3;
+%kt(4,1) = 6.76e6;
+%kt(5,1) = 7.34e5;
+%kt(6,1) = 1.03e6;
+kt(7,1) = 1e10;
+%kt(8,1) = 1.0e1;
 
 %% concentration inside c(n_comp x n_species)
 % this should actually be n_species, n_comp, but already writen
@@ -392,7 +446,7 @@ kt(2,1) = 2.5e2;
 % we'll just take the transpose of it:)
 
 % first set each concentration to a very small value, can not be zero.
-% 1: ground, 2: matrix
+% 1: ground, 2: matrix, 3: IMS
 c0(18,1) = 2.3000052e-3;
 c0(19,1) = 1.87e-4;
 c0(24,1) = 5.20e-9;
@@ -408,6 +462,8 @@ c0(8,2) = 1.08e-4;
 c0(9,2) = 4.91e-4;
 c0(10,2) = 1.0e-5;
 c0(11,2) = 1.8e-4;
+c0(12,2) = 1.9e-2;
+c0(13,2) = 1.0e-3;
 c0(14,2) = 2.0e-3;
 c0(15,2) = 1.0e-3;
 c0(16,2) = 1.014060052e-1;
@@ -466,7 +522,7 @@ c0(68,2) = 1.0e-3;
 c0(69,2) = 1.0910052e-3;
 c0(70,2) = 1.8e-4;
 c0(71,2) = 2.087e-3;
-c0(72,2) = 1.15e-3;
+c0(72,2) = 1.15e-6;
 c0(73,2) = 1.161e-3;
 c0(74,2) = 2.7e-5;
 c0(75,2) = 1.161e-3;
@@ -477,13 +533,27 @@ c0(79,2) = 9e-3;
 c0(80,2) = 1.725e-3;
 c0(81,2) = 1.868e-3;
 c0(82,2) = 1.51e-4;
+c0(16,3) = 9.6880398e-3;
+c0(17,3) = 3.40570052e-2;
+c0(18,3) = 1.87e-4;
+c0(83,3) = 2.05e-3;
+c0(84,3) = 2.73333333333333e-3;
+c0(85,3) = 1.0e-6;
+c0(21,3) = 3.535e-3;
+c0(22,3) = 1.7e-3;
+c0(82,3) = 1.51e-4;
+c0(24,3) = 3.98e-8;
+c0(26,3) = 7.07e-3;
+c0(27,3) = 5.1e-3;
+c0(72,3) = 1.15e-3;
 
 c0 = neutralize_charge(c0, z);
 
 % voltage v(n_comp)
 % initial values for compartment potentials. 
 v0(:) = 0;
-v0(2) = 0;
+v0(2) = .2;
+v0(3) = .2;
 
 verify_stochiometry(si, z);
 
@@ -501,7 +571,7 @@ verify_stochiometry(si, z);
 fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 
 % load initial conditions
-% load('krebs_initial')
+%load('whole_initial')
 
 
 % pack the initial values into the state vector
@@ -513,7 +583,7 @@ state = karyote_pack(c0,v0);
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-tf = 2e-6;
+tf = 2e-10;
 
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...

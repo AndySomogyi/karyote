@@ -214,7 +214,7 @@ z(114) =  1;
 z(115) = -1;
 
 %% volume of each compartment
-o(:) = [2.0e-7 7.0e07 1.6e-04, Inf];
+o(:) = [2.0e-7 7.0e-7 1.6e-6, Inf];
 
 %% stoichometry of intra-compartment reactions, indexing: nspecies x ncomp x nreactions
 % 1-34 are fast rxns, 35-44 are slow rxns (fast and slow are intracomparmental) 
