@@ -595,14 +595,33 @@ options = odeset('NonNegative', 1:(n_species*n_comp), ...
                  'InitialStep', 0.00001*abs(t0-tf));
 [t,y] = ode15s(fun, [t0, tf], state, options);
 
-c = y(:,1:(n_species*n_comp));
-v = y(:,(n_species*n_comp)+1:end);
+[c,v] = karyote_unpack(y, n_comp, n_species);
 
-disp(c(1,:));
-disp(c(end,:));
-    
-subplot(2,1,1);
-plot(t,c);
+% c is now a [n_time, n_comp, n_species] matrix. 
 
-subplot(2,1,2);
+% to display a single species, say 84 for all compartments, pick 
+% that one out via:
+squeeze(c(end,:,84))
+% the squeeze() function is required because because MATALB is a little
+% dumb when it comes to multi dim matricies: here we pick out the last 
+% time value (end), all the compartments (:) and species 84 (84), so this
+% results in a [1,3,1] matrix, MATALB is evidently not smart enough to
+% recognize that this is a just a length 3 vector, so we have to tell
+% is to squeeze it down to a length 3 vector via squeeze. 
+
+% same thing with all the plots below:
+
+disp('final values: ');
+disp(squeeze(c(end,:,:))');
+
+subplot(4,1,1);
+plot(t,squeeze(c(:,1,:)));
+
+subplot(4,1,2);
+plot(t,squeeze(c(:,2,:)));
+
+subplot(4,1,3);
+plot(t,squeeze(c(:,3,:)));
+
+subplot(4,1,4);
 plot(t,v);

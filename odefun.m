@@ -10,6 +10,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
 %        size(n_comp, n_comp), must have zero diagonal. 
 %    h: membrane permeability for species i between compartments, 
 %        size(n_species, n_comp, n_comp).
+%        length / time 
 %    z: valence of species i, size(n_species)
 %    o: volume of compartments, size(n_comp)
 %    si: stochiometry matrix for intra-compartment reactions,

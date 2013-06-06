@@ -1,9 +1,11 @@
 function [e] = equilibrium_factor(c,z,v,l)
 % The GHK flux equation
 % c: concentration, size: (n compartment x m species), 1
+%    mol / L
 % z: valences, m species
 % v: voltages for compartments, n comp
 % l: membrane thickness separating compartments, n comp x n comp
+% returns mol / (L * nm)
 % = Faraday's constant Valence of i
 % Electrical potential in Thickness of the membrane
 

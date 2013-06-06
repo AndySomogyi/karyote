@@ -3,6 +3,7 @@ function [ j ] = charge_neutral_flux(j, z)
 % Any excess charged flux is removed.
 % j: total flux, n_species x n_comp x n_comp
 % z: is the vector of valences, dims: 1 x n_species
+% 
 
     n_comp = size(j,2);
     zp = zeros(size(z));
