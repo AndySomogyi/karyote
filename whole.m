@@ -9,7 +9,7 @@ F= 96485.3365; R=8.3144621; T=300;
 n_comp = 3;
 n_species = 85;
 n_intra_reactions = 47;
-n_trans_reactions = 8;
+n_trans_reactions = 9;
 
 % first make empty (zero) matricies to store the parameters, 
 % easier this way as most parameters are zero.
@@ -99,6 +99,8 @@ l(3,2) = 2;
 
 %% permeability, (n_species, n_comp, n_comp) %%
 % diffuse from universe to into outer comp (1)
+h(72,1,3) = 1;
+h(72,3,1) = 1;
 h(85,2,3) = 1;
 h(85,3,2) = 1;
 
@@ -367,6 +369,9 @@ st(72,2,8) = -1;
 st(17,3,8) = -3;
 st(72,3,8) =  1;
 st(17,2,8) =  3;
+st(72,2,9) = -2;
+st(72,3,9) =  2;
+
 
 %% Intra-Compartment Reaction Rate Constants
 % (n_intra_reactions, 2)
@@ -422,23 +427,16 @@ ki(47,1) = 1.0e9;
 %% Trans-Compartment Reaction Rates,
 % (n_trans_reactions, 2)
 % column 1 is forward rate, column 2 is back rate
-%kt(1,1) = 9.23e3;
-%kt(2,1) = 2e1;
-%kt(3,1) = 4.76e3;
-%kt(4,1) = 6.76e6;
-%kt(5,1) = 7.34e5;
-%kt(6,1) = 1.03e6;
-%kt(7,1) = 4e7;
-%kt(8,1) = 1.0e1;
+kt(1,1) = 9.23e3;
+kt(2,1) = 2e1;
+kt(3,1) = 4.76e3;
+kt(4,1) = 6.76;
+kt(5,1) = 7.34e5;
+kt(6,1) = 1.03e6;
+kt(7,1) = 4e7;
+kt(8,1) = 1.0e1;
+kt(9,1) = 1e3
 
-%kt(1,1) = 9.23e3;
-%kt(2,1) = 2e1;
-%kt(3,1) = 4.76e3;
-%kt(4,1) = 6.76e6;
-%kt(5,1) = 7.34e5;
-%kt(6,1) = 1.03e6;
-kt(7,1) = 1e10;
-%kt(8,1) = 1.0e1;
 
 %% concentration inside c(n_comp x n_species)
 % this should actually be n_species, n_comp, but already writen
@@ -522,7 +520,7 @@ c0(68,2) = 1.0e-3;
 c0(69,2) = 1.0910052e-3;
 c0(70,2) = 1.8e-4;
 c0(71,2) = 2.087e-3;
-c0(72,2) = 1.15e-6;
+c0(72,2) = 1.15e-10;
 c0(73,2) = 1.161e-3;
 c0(74,2) = 2.7e-5;
 c0(75,2) = 1.161e-3;
@@ -545,14 +543,14 @@ c0(82,3) = 1.51e-4;
 c0(24,3) = 3.98e-8;
 c0(26,3) = 7.07e-3;
 c0(27,3) = 5.1e-3;
-c0(72,3) = 1.15e-3;
+c0(72,3) = 1.15e-10;
 
 c0 = neutralize_charge(c0, z);
 
 % voltage v(n_comp)
 % initial values for compartment potentials. 
 v0(:) = 0;
-v0(2) = .2;
+v0(2) = .2795;
 v0(3) = .2;
 
 verify_stochiometry(si, z);
@@ -571,7 +569,7 @@ verify_stochiometry(si, z);
 fun = odefun(cap, a, l, h, z, o, si, ki, st, kt, r);
 
 % load initial conditions
-%load('whole_initial')
+load('whole.mat')
 
 
 % pack the initial values into the state vector
@@ -583,7 +581,7 @@ state = karyote_pack(c0,v0);
     
 % test the function, call it once with the starting state vector. 
 t0 = 0;
-tf = 2e-10;
+tf = 2e-8;
 
 %options = odeset('NonNegative', 1:(length(state)-n_comp), ...
 %                 'RelTol', 1e-15, ...
@@ -592,6 +590,7 @@ tf = 2e-10;
 %[t,y] = ode15s(fun, [t0 tf], state, options);
 
 options = odeset('NonNegative', 1:(n_species*n_comp), ...
+                  'AbsTol', 1e-15, ...
                  'InitialStep', 0.00001*abs(t0-tf));
 [t,y] = ode15s(fun, [t0, tf], state, options);
 
@@ -601,7 +600,7 @@ options = odeset('NonNegative', 1:(n_species*n_comp), ...
 
 % to display a single species, say 84 for all compartments, pick 
 % that one out via:
-squeeze(c(end,:,84))
+squeeze(c(end,72,2))
 % the squeeze() function is required because because MATALB is a little
 % dumb when it comes to multi dim matricies: here we pick out the last 
 % time value (end), all the compartments (:) and species 84 (84), so this
@@ -612,16 +611,16 @@ squeeze(c(end,:,84))
 % same thing with all the plots below:
 
 disp('final values: ');
-disp(squeeze(c(end,:,:))');
+disp(squeeze(c(end,:,:)));
 
 subplot(4,1,1);
-plot(t,squeeze(c(:,1,:)));
+plot(t,squeeze(c(:,:,1)));
 
 subplot(4,1,2);
-plot(t,squeeze(c(:,2,:)));
+plot(t,squeeze(c(:,:,2)));
 
 subplot(4,1,3);
-plot(t,squeeze(c(:,3,:)));
+plot(t,squeeze(c(:,:,3)));
 
 subplot(4,1,4);
 plot(t,v);

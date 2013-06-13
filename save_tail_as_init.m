@@ -9,12 +9,10 @@ function [  ] = save_tail_as_init( fname, c, v )
 
 
     n_comp = size(v,2);
-    n_species = size(c,2) / n_comp;
+    n_species = size(c,85);
     
-    clast = c(end,:);
+    c0 = squeeze(c(end,:,:));
     v0 = v(end,:);
-    
-    c0 = reshape(clast, [n_species, n_comp]);
     
     save(fname, 'c0', 'v0');
     

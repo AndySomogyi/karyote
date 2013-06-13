@@ -98,6 +98,7 @@ function [ f ] = odefun(cap, a, l, h, z, o, si, ki, st, kt, r)
         % voltage vector, n_comp x 1
         v = state((n_comp*n_species)+1:end);
         
+        
         % verify charge neutrality
         q = kron(ones(1,n_comp), z) * c;
         

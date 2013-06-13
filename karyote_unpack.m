@@ -6,8 +6,16 @@ function [ c, v ] = karyote_unpack(packed, n_comp, n_species)
 % last n_comp is the compartment voltage. 
 
     n_time = size(packed, 1);
+    c = zeros([n_time, n_species, n_comp]);
+    % the packed time series of concentrations
+    cpacked = packed(:, 1:(n_comp*n_species));
+    
+    for t=1:n_time
+        cc = cpacked(t,:);
+        c(t,:,:) = reshape(cc, [n_species, n_comp]);
+    end
 
-    c = reshape(packed(:, 1:(n_comp*n_species)), [n_time, n_comp, n_species]);
+   
     v = packed(:, (n_comp*n_species)+1:end);
 
 
