@@ -1,7 +1,7 @@
 function [ fun,  init ] = test(n_comp, n_species, n_reactions)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
-
+% added a comment
 
 %    cap: compartment capacitance, size(n_comp,n_comp), 
 %        must have zero diagonal. 
